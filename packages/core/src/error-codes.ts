@@ -30,6 +30,11 @@ export const LEDGER_USE_CASE_ERROR_CODES = [
   "owner_taken",
   "advisor_file_invalid",
   "rule_source_missing",
+  "datev_settings_missing",
+  "too_many_entries",
+  "period_outside_fiscal_year",
+  "invalid_settings",
+  "too_many_rows",
 ] as const;
 export type LedgerUseCaseErrorCode = (typeof LEDGER_USE_CASE_ERROR_CODES)[number];
 

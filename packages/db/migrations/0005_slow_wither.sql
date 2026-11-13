@@ -1,0 +1,1 @@
+ALTER TABLE "ledger"."ledger_settings" ADD COLUMN "datev" jsonb;

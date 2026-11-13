@@ -50,6 +50,11 @@ export function createDrizzleLedgerRepository(db: DbExecutor): LedgerRepository 
       return first(rows, "ledger_settings");
     },
 
+    async setDatevSettings(tenantId, settings) {
+      const rows = await db.update(ledgerSettings).set({ datev: settings, updatedAt: new Date() }).where(eq(ledgerSettings.tenantId, tenantId)).returning({ tenantId: ledgerSettings.tenantId });
+      return rows.length > 0;
+    },
+
     // -----------------------------------------------------------------------------------------
     // Chart of accounts
     // -----------------------------------------------------------------------------------------

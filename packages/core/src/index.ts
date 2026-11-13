@@ -199,6 +199,8 @@ export {
   createFilingInputSchema,
   createHandoverInputSchema,
   createMatchInputSchema,
+  datevSettingsInputSchema,
+  type DatevSettingsInput,
   entryIdInputSchema,
   entryInputSchema,
   entryReasonInputSchema,

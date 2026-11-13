@@ -7,6 +7,7 @@
 import type { InferSelectModel } from "drizzle-orm";
 
 import type {
+  DatevTenantSettings,
   BookingAdviceRaw,
   BookingRuleDirection,
   EntrySnapshot,
@@ -196,6 +197,8 @@ export interface LedgerRepository {
   // Settings
   findSettings(tenantId: string): Promise<LedgerSettingsRow | null>;
   upsertSettings(tenantId: string, patch: LedgerSettingsPatch): Promise<LedgerSettingsRow>;
+  /** Stores the DATEV export's settings on an existing settings row; `false` without one. */
+  setDatevSettings(tenantId: string, settings: DatevTenantSettings): Promise<boolean>;
 
   // Chart of accounts
   /** Number order, archived accounts included. */
