@@ -36,9 +36,11 @@ docker run --rm -d --name ledger-test-pg -e POSTGRES_USER=ledger -e POSTGRES_PAS
 TEST_DATABASE_URL=postgres://ledger:ledger@localhost:55432/ledger_test pnpm test:db
 ```
 
-Status: phase 1. The API runs the bookkeeping of tenants (entries, accounts, balances, VAT
-preview, open items, rules, periods and filings) once a database is bound (`DATABASE_URL`).
-Sources from platforms (documents, money movements) and the DATEV export follow.
+Status: phase 2. The API runs the bookkeeping of tenants (entries, accounts, balances, VAT
+preview, open items, rules, periods and filings) once a database is bound (`DATABASE_URL`), and
+takes the platforms' sources: counterparties, money accounts and movements (pushed, or a camt.053
+statement), the accounting view of documents, and which document a movement pays.
+`sync_proposals` turns them into proposals. The DATEV export follows.
 
 ## A platform and its first key
 

@@ -6,9 +6,9 @@
 // the use cases made, with the rows those reads returned copied as plain types (narrowed to the
 // fields the ledger reads).
 //
-// Phase 1 has no sources of its own yet: `emptySourceReader` answers every read with nothing. A
-// later phase backs this port with the counterparty, money and document tables of this service
-// (or, during the switch, with Digipost's own reads).
+// `createDrizzleSourceReader` (`./drizzle-source-reader.ts`) backs this port with this service's
+// own source tables (`schema/sources.ts`), which platforms fill through the source operations;
+// `emptySourceReader` answers every read with nothing (tests of the ledger without sources).
 //
 // Every method takes the caller's resolved `tenantId` and must never return another tenant's row.
 // Nothing here is ever written by the ledger.
@@ -198,7 +198,7 @@ export interface LedgerSourceReader {
 
 const none = async () => [];
 
-/** Phase 1: no sources. Every list is empty and nothing exists, so an entry that names a document
+/** No sources. Every list is empty and nothing exists, so an entry that names a document
  * or a transaction is refused with `source_not_found`, and the proposal engine proposes nothing. */
 export const emptySourceReader: LedgerSourceReader = {
   listDocumentsForLedger: none,

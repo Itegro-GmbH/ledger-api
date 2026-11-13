@@ -248,3 +248,14 @@ export {
   type LedgerUseCaseErrorCode,
 } from "./error-codes";
 export * from "./datev";
+export {
+  Camt053Error,
+  camt053StatementReconciles,
+  parseCamt053,
+  type Camt053Balance,
+  type Camt053ParseResult,
+  type Camt053Statement,
+  type NormalizedTransaction as Camt053Transaction,
+} from "./camt053/camt053-parser";
+export { computeIdempotencyKeyV2, normalizeReference, OccurrenceCounter } from "./camt053/idempotency-key";
+export { assertSafeXml, UnsafeXmlError } from "./camt053/xml-safety";

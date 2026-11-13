@@ -3,9 +3,10 @@
 import type { Operation } from "./kit";
 import { LEDGER_OPERATIONS } from "./ledger-operations";
 import { getChartTemplate, listTaxCodes } from "./reference-operations";
+import { SOURCE_OPERATIONS } from "./source-operations";
 import { TENANT_OPERATIONS } from "./tenant-operations";
 
-export const OPERATIONS: readonly Operation[] = [listTaxCodes, getChartTemplate, ...TENANT_OPERATIONS, ...LEDGER_OPERATIONS];
+export const OPERATIONS: readonly Operation[] = [listTaxCodes, getChartTemplate, ...TENANT_OPERATIONS, ...LEDGER_OPERATIONS, ...SOURCE_OPERATIONS];
 
 const names = new Set<string>();
 for (const operation of OPERATIONS) {

@@ -3,6 +3,7 @@
 import type { DbExecutor } from "../../foundation/db-types";
 import type { Repositories } from "../contracts";
 import { createDrizzleLedgerRepository } from "./ledger-repository";
+import { createDrizzleSourceRepository } from "./source-repository";
 import { createDrizzleApiKeyRepository, createDrizzleIdempotencyRepository, createDrizzlePlatformRepository, createDrizzleTenantRepository } from "./tenancy-repositories";
 
 export function createDrizzleRepositories(db: DbExecutor): Repositories {
@@ -12,5 +13,6 @@ export function createDrizzleRepositories(db: DbExecutor): Repositories {
     tenant: createDrizzleTenantRepository(db),
     apiKey: createDrizzleApiKeyRepository(db),
     idempotency: createDrizzleIdempotencyRepository(db),
+    sources: createDrizzleSourceRepository(db),
   };
 }

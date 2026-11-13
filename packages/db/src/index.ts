@@ -7,7 +7,8 @@
 //   const db = createDb(pool);
 //   const repos = createDrizzleRepositories(db);
 //   const uow = createDrizzleUnitOfWork(db);
-//   const ledger = createLedgerUseCases({ repos, uow, sources: emptySourceReader });
+//   const ledger = createLedgerUseCases({ repos, uow, sources: createDrizzleSourceReader(db) });
+//   const sources = createSourceUseCases({ repos, uow });
 export * from "./schema";
 export { createDb, type LedgerDb } from "./foundation/client";
 export type { DbExecutor, DbTx } from "./foundation/db-types";
@@ -30,6 +31,9 @@ export {
 
 export * from "./sources/source-reader";
 export * from "./sources/contact-resolution";
+export { createDrizzleSourceReader } from "./sources/drizzle-source-reader";
+export { DOCUMENT_PAYMENT_STATUSES, documentPaymentStatus, type DocumentPaymentStatus } from "./sources/payment-status";
+export { createDrizzleSourceRepository } from "./repositories/drizzle/source-repository";
 
 export {
   createLedgerUseCases,
@@ -42,3 +46,20 @@ export {
   type LedgerUseCases,
   type ProposalOutcome,
 } from "./use-cases/ledger-use-cases";
+export {
+  createSourceUseCases,
+  normalizeCode,
+  SOURCE_ERROR,
+  type CounterpartyInput,
+  type DocumentInput,
+  type LinkInput,
+  type MoneyAccountInput,
+  type MoneyAccountPatchInput,
+  type MovementInput,
+  type MovementUpsertResult,
+  type SourceErrorCode,
+  type SourceUseCaseDeps,
+  type SourceUseCases,
+  type StatementImportResult,
+  type StatementInput,
+} from "./use-cases/source-use-cases";
