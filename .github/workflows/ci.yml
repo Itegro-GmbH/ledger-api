@@ -1,6 +1,7 @@
 # CI and deployment (decisions/0001-ledger-api.md). Every pull request and every push to main:
 # typecheck, lint, unit tests, database tests against a throwaway Postgres. A push to main then
-# builds the Build Output and deploys it to Vercel production (region fra1).
+# applies the migrations to production (as the `ledger_api` role, which owns only schema
+# `ledger`), builds the Build Output and deploys it to Vercel production (region fra1).
 name: CI
 
 on:
@@ -64,6 +65,10 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Apply the migrations to production
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_MIGRATE }}
+        run: pnpm db:migrate
       - run: pnpm build
       - name: Deploy the prebuilt output
         env:
