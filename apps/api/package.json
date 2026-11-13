@@ -1,0 +1,17 @@
+{
+  "name": "@ledger/api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/dev.ts",
+    "build": "node scripts/build.mjs"
+  },
+  "dependencies": {
+    "@ledger/core": "workspace:*",
+    "@ledger/operations": "workspace:*",
+    "hono": "^4",
+    "@hono/node-server": "^1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": { "esbuild": "^0.25" }
+}
