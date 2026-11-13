@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/dev.ts",
-    "build": "node scripts/build.mjs"
+    "build": "node scripts/build.mjs",
+    "create-platform": "tsx scripts/create-platform.ts"
   },
   "dependencies": {
     "@hono/node-server": "^1",
@@ -12,9 +13,12 @@
     "@ledger/operations": "workspace:*",
     "@modelcontextprotocol/server": "2.3.1",
     "hono": "^4",
-    "zod": "^4.6.5"
+    "zod": "^4.6.5",
+    "@ledger/db": "workspace:*",
+    "pg": "^8.23.0"
   },
   "devDependencies": {
-    "esbuild": "^0.25"
+    "esbuild": "^0.25",
+    "@types/pg": "^8.23.1"
   }
 }

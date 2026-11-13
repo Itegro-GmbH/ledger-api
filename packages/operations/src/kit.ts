@@ -1,6 +1,7 @@
 // The shape every operation is declared in (decisions/0001-ledger-api.md, "One operation
 // catalog, three surfaces"). One definition becomes `POST /v1/<name>`, an OpenAPI path and an
 // MCP tool with the same name, description and input schema. Neutral: no I/O, no HTTP.
+import type { LedgerUseCases, TenantRepository } from "@ledger/db";
 import { z } from "zod";
 
 /** How an operation changes data: drives the MCP annotations and the idempotency rule. */
@@ -36,8 +37,16 @@ export const OPERATION_ERROR = {
 
 export type OperationOutcome = { ok: true; data: Record<string, unknown> } | { ok: false; code: string; details?: Record<string, unknown> };
 
+/** What operations work with, bound by the composition root to the database (`@ledger/db`).
+ * `null` only in tests of the HTTP surface and while no database is configured. */
+export type OperationServices = {
+  ledger: LedgerUseCases;
+  tenants: TenantRepository;
+};
+
 /** The caller as an operation sees it, resolved before `run`. */
 export type OperationContext = {
+  services: OperationServices | null;
   platform: { id: string; name: string } | null;
   tenant: { id: string; name: string } | null;
   /** `Ledger-Actor`: who acted on the platform's side, recorded in revisions. */

@@ -137,7 +137,7 @@ export const ledgerFilings = ledgerSchema.table(
     /** `no action`: a tenant deletion removes both rows in the same statement. */
     correctsFilingId: uuid().references((): AnyPgColumn => ledgerFilings.id),
     note: text(),
-    createdByUserId: uuid(),
+    createdByUserId: text(),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   },
@@ -183,7 +183,7 @@ export const journalEntries = ledgerSchema.table(
     userEditedAt: timestamp({ withTimezone: true }),
     revision: integer().notNull().default(1),
     bookedAt: timestamp({ withTimezone: true }),
-    bookedByUserId: uuid(),
+    bookedByUserId: text(),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   },
@@ -252,7 +252,7 @@ export const journalEntryRevisions = ledgerSchema.table(
     bookingDate: date({ mode: "string" }).notNull(),
     /** The entry and its lines BEFORE the change; `null` for `created`. */
     snapshot: jsonb().$type<EntrySnapshot | null>(),
-    changedByUserId: uuid(),
+    changedByUserId: text(),
     changedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [
@@ -274,7 +274,7 @@ export const ledgerOpenItemMatches = ledgerSchema.table(
     accountId: uuid().notNull(),
     kind: text({ enum: OPEN_ITEM_MATCH_KINDS }).notNull(),
     note: text(),
-    createdByUserId: uuid(),
+    createdByUserId: text(),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [
@@ -350,7 +350,7 @@ export const ledgerHandovers = ledgerSchema.table(
     periodFrom: date({ mode: "string" }).notNull(),
     periodTo: date({ mode: "string" }).notNull(),
     note: text(),
-    createdByUserId: uuid(),
+    createdByUserId: text(),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index("ledger_handovers_tenant_idx").on(t.tenantId, t.createdAt), check("ledger_handovers_period_check", sql`${t.periodFrom} <= ${t.periodTo}`)],
@@ -367,7 +367,7 @@ export const ledgerAdvisorBalances = ledgerSchema.table(
     periodFrom: date({ mode: "string" }).notNull(),
     periodTo: date({ mode: "string" }).notNull(),
     fileName: text(),
-    uploadedByUserId: uuid(),
+    uploadedByUserId: text(),
     uploadedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [
