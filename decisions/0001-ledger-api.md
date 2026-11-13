@@ -307,3 +307,24 @@ Phase 3 does not depend on phase 2 and can run in parallel if reserwirt is more 
 - Pricing of the API (per tenant and month is the working assumption).
 - Whether Itegro's tax advisor accepts a DATEV import from this service; her answer also
   settles the BU-key table for SKR04.
+
+## Production setup (2026-11-13)
+
+What was done in production, additive only, after a full `pg_dump` of the shared database (kept
+outside this repository):
+
+- Role `ledger_api` (login) owns schema `ledger` in Digipost's database instance. It has `CREATE`
+  on the database (drizzle's migrator runs `CREATE SCHEMA IF NOT EXISTS`) and no privilege on any
+  table in `public`: a read of Digipost's tables is refused. Digipost's roles have none on `ledger`.
+- This repository's migrations ran there as `ledger_api` (tables in `ledger`, migrations table
+  `ledger.__migrations`). The API runs with the pooled connection of the same role.
+- Platforms `digipost` (live key with `filing`) and `reserwirt` (test key) exist; their keys are
+  in the secret store, never in this repository.
+
+This changes step 2 of "Moving Digipost's ledger here": `ledger` already holds this service's own,
+empty tables, so Digipost's tables cannot simply be moved into it with `SET SCHEMA`. Instead, at
+the switch, one transaction in the same database copies Digipost's rows into `ledger` with
+`INSERT ... SELECT`, keeping every id (`tenant.id = workspace.id`), with the balance and lock
+triggers active, and verifies the counts and balances before it commits. Digipost's own tables
+stay untouched until the switch is verified, and are dropped only in a later, separate step.
+Nothing leaves the database instance; nothing is lost if the copy fails, since it rolls back.
