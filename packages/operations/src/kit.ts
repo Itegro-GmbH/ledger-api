@@ -1,7 +1,7 @@
 // The shape every operation is declared in (decisions/0001-ledger-api.md, "One operation
 // catalog, three surfaces"). One definition becomes `POST /v1/<name>`, an OpenAPI path and an
 // MCP tool with the same name, description and input schema. Neutral: no I/O, no HTTP.
-import type { LedgerUseCases, TenantRepository } from "@ledger/db";
+import type { LedgerUseCases, SourceUseCases, TenantRepository } from "@ledger/db";
 import { z } from "zod";
 
 /** How an operation changes data: drives the MCP annotations and the idempotency rule. */
@@ -42,6 +42,8 @@ export type OperationOutcome = { ok: true; data: Record<string, unknown> } | { o
 export type OperationServices = {
   ledger: LedgerUseCases;
   tenants: TenantRepository;
+  /** Counterparties, money accounts and movements, documents and their links. */
+  sources: SourceUseCases;
 };
 
 /** The caller as an operation sees it, resolved before `run`. */

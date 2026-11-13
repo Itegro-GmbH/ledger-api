@@ -5,8 +5,9 @@ import {
   createDb,
   createDrizzleRepositories,
   createDrizzleUnitOfWork,
+  createDrizzleSourceReader,
   createLedgerUseCases,
-  emptySourceReader,
+  createSourceUseCases,
   type Repositories,
 } from "@ledger/db";
 import { KEY_SCOPES, type KeyScope, type OperationOutcome } from "@ledger/operations";
@@ -20,8 +21,10 @@ import { httpStatusOf } from "./http-status";
 export function createDatabaseDeps(pool: Pool): Pick<AppDeps, "callers" | "idempotency" | "bindServices"> {
   const db = createDb(pool);
   const repos = createDrizzleRepositories(db);
-  const ledger = createLedgerUseCases({ repos, uow: createDrizzleUnitOfWork(db), sources: emptySourceReader });
-  const services = { ledger, tenants: repos.tenant };
+  const uow = createDrizzleUnitOfWork(db);
+  const ledger = createLedgerUseCases({ repos, uow, sources: createDrizzleSourceReader(db) });
+  const sources = createSourceUseCases({ repos, uow });
+  const services = { ledger, tenants: repos.tenant, sources };
   return { callers: callerStore(repos), idempotency: idempotencyStore(repos), bindServices: (ctx) => ({ ...ctx, services }) };
 }
 
