@@ -13,7 +13,10 @@
     "test:db": "vitest run --project db",
     "verify": "pnpm typecheck && pnpm lint && pnpm test",
     "build": "pnpm --filter @ledger/api build",
-    "dev": "pnpm --filter @ledger/api dev"
+    "dev": "pnpm --filter @ledger/api dev",
+    "db:generate": "pnpm --filter @ledger/db db:generate",
+    "db:generate:custom": "pnpm --filter @ledger/db db:generate:custom",
+    "db:migrate": "pnpm --filter @ledger/db db:migrate"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
