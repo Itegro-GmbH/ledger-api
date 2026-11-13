@@ -7,11 +7,14 @@
     "build": "node scripts/build.mjs"
   },
   "dependencies": {
+    "@hono/node-server": "^1",
     "@ledger/core": "workspace:*",
     "@ledger/operations": "workspace:*",
+    "@modelcontextprotocol/server": "2.3.1",
     "hono": "^4",
-    "@hono/node-server": "^1",
     "zod": "^4.6.5"
   },
-  "devDependencies": { "esbuild": "^0.25" }
+  "devDependencies": {
+    "esbuild": "^0.25"
+  }
 }
