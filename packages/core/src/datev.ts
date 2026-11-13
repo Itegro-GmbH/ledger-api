@@ -313,3 +313,38 @@ export function encodeWindows1252(text: string): Uint8Array {
 export function isTaxedCode(code: TaxCode | null): boolean {
   return code !== null && TAXED_CODES.includes(code);
 }
+
+// --- A tenant's DATEV settings ---------------------------------------------------------------
+
+/** What a tenant stores (`ledger_settings.datev`). Tax keys and automatic accounts fall back to
+ * the chart's defaults while unset. */
+export type DatevTenantSettings = {
+  consultantNumber: number;
+  clientNumber: number;
+  accountLength: number;
+  /** 1 to 12: the month the fiscal year starts in. */
+  fiscalYearStartMonth: number;
+  taxKeys: Partial<Record<TaxCode, string | null>> | null;
+  automaticAccounts: string[] | null;
+};
+
+/** The fiscal year start (YYYY-MM-DD) of the year `date` lies in. */
+export function fiscalYearStartOf(date: string, startMonth: number): string {
+  const year = Number(date.slice(0, 4));
+  const month = Number(date.slice(5, 7));
+  const startYear = month >= startMonth ? year : year - 1;
+  return `${startYear}-${String(startMonth).padStart(2, "0")}-01`;
+}
+
+/** The settings the writer needs for a period, from what the tenant stored. */
+export function resolveDatevSettings(stored: DatevTenantSettings, chart: "skr03" | "skr04", periodFrom: string): DatevSettings {
+  return {
+    consultantNumber: stored.consultantNumber,
+    clientNumber: stored.clientNumber,
+    accountLength: stored.accountLength,
+    fiscalYearStart: fiscalYearStartOf(periodFrom, stored.fiscalYearStartMonth),
+    chart,
+    taxKeys: { ...DEFAULT_DATEV_TAX_KEYS, ...(stored.taxKeys ?? {}) },
+    automaticAccounts: stored.automaticAccounts ?? [...DEFAULT_DATEV_AUTOMATIC_ACCOUNTS[chart]],
+  };
+}

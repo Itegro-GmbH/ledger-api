@@ -234,3 +234,17 @@ export type SyncProposalsInput = z.infer<typeof syncProposalsInputSchema>;
 export const suggestMatchesInputSchema = z.object({ accountId: z.uuid() });
 
 export const yearInputSchema = z.object({ year: z.number().int().min(2000).max(2100) });
+
+const datevTaxKey = z.string().regex(/^\d{1,4}$/).nullable();
+/** A tenant's DATEV settings (`set_datev_settings`): consultant and client number from the tax
+ * advisor, the account length of the client in DATEV, the fiscal year's first month, and
+ * optionally the advisor's tax keys per tax code and automatic accounts. */
+export const datevSettingsInputSchema = z.object({
+  consultantNumber: z.number().int().min(1001).max(9_999_999),
+  clientNumber: z.number().int().min(1).max(99_999),
+  accountLength: z.number().int().min(4).max(8).default(4),
+  fiscalYearStartMonth: z.number().int().min(1).max(12).default(1),
+  taxKeys: z.partialRecord(z.enum(TAX_CODES), datevTaxKey).nullable().default(null),
+  automaticAccounts: z.array(accountNumberSchema).max(200).nullable().default(null),
+});
+export type DatevSettingsInput = z.infer<typeof datevSettingsInputSchema>;
