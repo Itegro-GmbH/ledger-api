@@ -21,5 +21,5 @@ export function bearerSecret(authorization: string | undefined): string | null {
 }
 
 export function anonymousContext(actor: string | undefined): OperationContext {
-  return { platform: null, tenant: null, actor: actor?.trim().slice(0, 200) || null, environment: null };
+  return { services: null, platform: null, tenant: null, actor: actor?.trim().slice(0, 200) || null, environment: null };
 }

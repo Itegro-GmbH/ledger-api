@@ -2,6 +2,12 @@
   "name": "@ledger/operations",
   "private": true,
   "type": "module",
-  "exports": { ".": "./src/index.ts" },
-  "dependencies": { "@ledger/core": "workspace:*", "zod": "^4.6.5" }
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@ledger/core": "workspace:*",
+    "zod": "^4.6.5",
+    "@ledger/db": "workspace:*"
+  }
 }

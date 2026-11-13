@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { createApp } from "../src/app";
 import type { CallerStore } from "../src/caller";
 import type { IdempotencyStore } from "../src/execute";
-import { defineOperation, ok } from "@ledger/operations";
+import { defineOperation, ok, OPERATIONS } from "@ledger/operations";
 import { z } from "zod";
 
 const post = (app: ReturnType<typeof createApp>, path: string, body: unknown, headers: Record<string, string> = {}) =>
@@ -72,7 +72,9 @@ describe("the HTTP surface", () => {
 
   it("publishes an OpenAPI document built from the catalog", async () => {
     const doc = (await (await createApp({ callers: null }).request("/openapi.json")).json()) as { paths: Record<string, unknown> };
-    expect(Object.keys(doc.paths)).toEqual(["/v1/list_tax_codes", "/v1/get_chart_template"]);
+    expect(Object.keys(doc.paths)).toContain("/v1/list_tax_codes");
+    expect(Object.keys(doc.paths)).toContain("/v1/submit_filing");
+    expect(Object.keys(doc.paths)).toHaveLength(OPERATIONS.length);
   });
 });
 

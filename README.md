@@ -36,5 +36,21 @@ docker run --rm -d --name ledger-test-pg -e POSTGRES_USER=ledger -e POSTGRES_PAS
 TEST_DATABASE_URL=postgres://ledger:ledger@localhost:55432/ledger_test pnpm test:db
 ```
 
-Status: phase 1 in progress. Reference data is live; tenants, keys and bookings follow with the
-database layer.
+Status: phase 1. The API runs the bookkeeping of tenants (entries, accounts, balances, VAT
+preview, open items, rules, periods and filings) once a database is bound (`DATABASE_URL`).
+Sources from platforms (documents, money movements) and the DATEV export follow.
+
+## A platform and its first key
+
+Platforms are not self-service. The owner creates one, with its first key, against the database:
+
+```sh
+DATABASE_URL=... pnpm --filter @ledger/api create-platform --name "Muster Plattform" --environment test
+```
+
+The secret is printed once and stored only as a hash. Then:
+
+```sh
+curl -s -X POST $URL/v1/create_tenant -H "authorization: Bearer $KEY" -H "idempotency-key: $(uuidgen)" \
+  -H 'content-type: application/json' -d '{"name":"Muster GmbH","externalRef":"wirt-1"}'
+```
