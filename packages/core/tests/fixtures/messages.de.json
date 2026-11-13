@@ -1,0 +1,972 @@
+{
+ "Ledger": {
+  "errors": {
+   "invalid_input": "Die Eingaben sind unvollständig oder ungültig.",
+   "disabled": "Die Buchhaltung ist für diesen Arbeitsbereich nicht aktiviert.",
+   "not_found": "Dieser Eintrag existiert nicht (mehr).",
+   "account_not_found": "Dieses Konto gibt es in Ihrem Kontenplan nicht.",
+   "account_archived": "Dieses Konto ist archiviert. Bitte wählen Sie ein anderes Konto.",
+   "account_number_taken": "Diese Kontonummer ist bereits vergeben.",
+   "owner_not_found": "Das zugeordnete Bankkonto oder der Kontakt wurde nicht gefunden.",
+   "owner_taken": "Für dieses Bankkonto, diesen Kontakt oder diese Plattform gibt es bereits ein Konto.",
+   "source_not_found": "Der verknüpfte Beleg, Bankumsatz oder die korrigierte Buchung wurde nicht gefunden.",
+   "unbalanced": "Soll und Haben sind nicht gleich. Bitte verteilen Sie die Differenz, bevor Sie buchen.",
+   "locked": "Dieser Zeitraum ist durch eine eingereichte Meldung gesperrt. Buchen Sie eine Korrektur in einem offenen Zeitraum oder legen Sie eine berichtigte Meldung an.",
+   "reason_required": "Bitte geben Sie an, warum Sie eine gebuchte Buchung ändern.",
+   "stale_revision": "Die Buchung wurde inzwischen geändert. Bitte laden Sie die Seite neu.",
+   "already_booked": "Diese Buchung ist bereits gebucht.",
+   "not_booked": "Diese Buchung ist nicht gebucht.",
+   "not_proposed": "Das ist nur bei einem offenen Vorschlag möglich.",
+   "invalid_filing": "Die gewählte Meldung ist keine offene berichtigte Meldung für dieses Datum.",
+   "filing_choice_required": "Für dieses Datum gibt es mehrere offene berichtigte Meldungen. Bitte wählen Sie, zu welcher die Buchung gehört.",
+   "filing_overlaps": "Für diesen Zeitraum gibt es bereits eine Meldung.",
+   "filing_not_draft": "Diese Meldung ist bereits eingereicht.",
+   "filing_not_submitted": "Nur eine eingereichte Meldung kann berichtigt werden.",
+   "correction_exists": "Für diese Meldung gibt es bereits eine offene Berichtigung.",
+   "account_not_open_items": "Dieses Konto führt keine offenen Posten.",
+   "line_not_on_account": "Mindestens ein Posten gehört nicht zu diesem Konto oder ist noch nicht gebucht.",
+   "line_already_matched": "Mindestens ein Posten ist bereits ausgeglichen.",
+   "match_not_zero": "Die ausgewählten Posten ergeben nicht null. Wählen Sie weitere Posten oder erklären Sie den Rest.",
+   "advisor_file_invalid": "Die Datei konnte nicht gelesen werden. Bitte laden Sie die Summen- und Saldenliste als CSV-Datei aus DATEV hoch.",
+   "unauthenticated": "Bitte melden Sie sich erneut an.",
+   "no_workspace": "Sie gehören zu keinem Arbeitsbereich.",
+   "forbidden": "Dafür fehlt Ihnen die Berechtigung.",
+   "unknown": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
+   "rule_source_missing": "Aus dieser Buchung lässt sich keine Regel ableiten: Es fehlt ein Kontakt oder eine Gegenpartei, oder die Buchung verteilt sich auf mehrere Konten."
+  },
+  "taxCodes": {
+   "vst19": {
+    "label": "Vorsteuer 19 %",
+    "hint": "Rechnung eines deutschen Anbieters mit 19 % Umsatzsteuer. Die Steuer erstattet Ihnen das Finanzamt."
+   },
+   "vst7": {
+    "label": "Vorsteuer 7 %",
+    "hint": "Rechnung mit dem ermäßigten Satz von 7 %, zum Beispiel für Bücher oder Lebensmittel. Die Steuer erstattet Ihnen das Finanzamt."
+   },
+   "rc13b": {
+    "label": "Reverse Charge (§ 13b UStG)",
+    "hint": "Rechnung eines ausländischen Anbieters ohne deutsche Umsatzsteuer, zum Beispiel von Meta, Google oder Apple. Sie schulden die Steuer selbst und ziehen sie im selben Zug als Vorsteuer wieder ab. Sie zahlen dadurch nichts, aber beides steht in der Umsatzsteuer-Voranmeldung."
+   },
+   "ust19": {
+    "label": "Umsatzsteuer 19 %",
+    "hint": "Ihre eigene Rechnung an einen Kunden in Deutschland mit 19 % Umsatzsteuer, die Sie an das Finanzamt abführen."
+   },
+   "ust7": {
+    "label": "Umsatzsteuer 7 %",
+    "hint": "Ihre eigene Rechnung mit dem ermäßigten Satz von 7 %, den Sie an das Finanzamt abführen."
+   },
+   "eu_not_taxable": {
+    "label": "Leistung an EU-Unternehmen (nicht steuerbar)",
+    "hint": "Ihre Rechnung an ein Unternehmen in einem anderen EU-Land. Der Kunde versteuert sie dort. Sie melden nur den Betrag in Kennzahl 21."
+   },
+   "not_taxable": {
+    "label": "Nicht steuerbar",
+    "hint": "Ohne Umsatzsteuer und ohne Vorsteuer, zum Beispiel Gebühren einer Behörde, Gerichtskosten oder Stammkapital."
+   },
+   "tax_free": {
+    "label": "Steuerfrei",
+    "hint": "Eine steuerfreie Leistung, zum Beispiel eine Versicherung oder Zinsen. Es gibt keine Vorsteuer."
+   },
+   "pass_through": {
+    "label": "Durchlaufender Posten",
+    "hint": "Geld, das Sie nur im Namen eines anderen weitergeben, zum Beispiel Gerichtskosten auf einer Notarrechnung. Ohne Umsatzsteuer und ohne Vorsteuer."
+   }
+  },
+  "kennzahlen": {
+   "81": "Steuerpflichtige Umsätze zu 19 %",
+   "86": "Steuerpflichtige Umsätze zu 7 %",
+   "21": "Nicht steuerbare sonstige Leistungen an Unternehmen in der EU",
+   "46": "Leistungen ausländischer Unternehmer nach § 13b UStG",
+   "47": "Umsatzsteuer auf Leistungen nach § 13b UStG",
+   "66": "Vorsteuer aus Rechnungen anderer Unternehmer",
+   "67": "Vorsteuer aus Leistungen nach § 13b UStG",
+   "83": "Zahllast oder Erstattung"
+  },
+  "accountKinds": {
+   "asset": "Vermögen",
+   "liability": "Schulden",
+   "equity": "Eigenkapital",
+   "revenue": "Erlöse",
+   "expense": "Kosten"
+  },
+  "groups": {
+   "bank": "Bank und Geld",
+   "open_items": "Offene Posten",
+   "costs": "Kosten",
+   "revenue": "Einnahmen",
+   "taxes": "Steuern",
+   "equity": "Eigenkapital",
+   "other": "Sonstiges"
+  },
+  "ownerTypes": {
+   "bank_account": "Bankkonto",
+   "contact": "Kontakt",
+   "platform": "Plattform",
+   "person": "Person"
+  },
+  "statuses": {
+   "proposed": "Vorschlag",
+   "booked": "Gebucht",
+   "dismissed": "Verworfen"
+  },
+  "origins": {
+   "template": "Vorlage",
+   "rule": "Regel",
+   "ai": "KI",
+   "manual": "Manuell"
+  },
+  "taxRoles": {
+   "base": "Betrag",
+   "tax": "Steuer"
+  },
+  "amountModes": {
+   "gross": "Brutto",
+   "net": "Netto"
+  },
+  "revisionKinds": {
+   "created": "Angelegt",
+   "edited": "Geändert",
+   "booked": "Gebucht",
+   "unbooked": "Buchung aufgehoben",
+   "dismissed": "Verworfen",
+   "restored": "Wiederhergestellt",
+   "deleted": "Gelöscht"
+  },
+  "matchKinds": {
+   "match": "Ausgeglichen",
+   "explained": "Rest erklärt"
+  },
+  "openItemStatuses": {
+   "zero": "Steht auf null",
+   "explained": "Erklärt",
+   "open": "Offen"
+  },
+  "ruleDirections": {
+   "incoming": "Ausgaben (Geld raus)",
+   "outgoing": "Einnahmen (Geld rein)",
+   "any": "Ausgaben und Einnahmen"
+  },
+  "filingKinds": {
+   "vat_return": "Umsatzsteuer-Voranmeldung",
+   "annual_statement": "Jahresabschluss"
+  },
+  "filingStatuses": {
+   "draft": "Entwurf",
+   "submitted": "Eingereicht"
+  },
+  "vatPeriods": {
+   "month": "Monatlich",
+   "quarter": "Vierteljährlich"
+  },
+  "vatBases": {
+   "soll": "Soll-Versteuerung (nach Rechnungsdatum)",
+   "ist": "Ist-Versteuerung (nach Zahlungseingang)"
+  },
+  "periodStatus": {
+   "submitted": "Eingereicht",
+   "handed_over": "Übergeben",
+   "ready": "Bereit",
+   "in_progress": "In Arbeit",
+   "open": "Offen"
+  },
+  "periodChangesSince": "{count, plural, =0 {Seit der Übergabe unverändert} one {# Änderung seit der Übergabe} other {# Änderungen seit der Übergabe}}",
+  "warnings": {
+   "no_tax_breakdown": "Auf dem Beleg wurde keine Aufteilung nach Steuersätzen erkannt.",
+   "amount_differs_from_payment": "Der Betrag weicht von der Zahlung ab.",
+   "possible_pass_through": "Der Beleg enthält möglicherweise durchlaufende Posten ohne Vorsteuer, zum Beispiel Gerichtskosten.",
+   "foreign_supplier_with_vat": "Ein ausländischer Anbieter berechnet deutsche Umsatzsteuer. Bitte prüfen Sie den Steuerschlüssel.",
+   "duplicate_suspect": "Möglicherweise doppelt: Es gibt bereits eine ähnliche Buchung.",
+   "ai_unavailable": "Die KI war nicht erreichbar. Der Vorschlag nutzt die Standardvorlage.",
+   "reverse_charge_conflict": "Der Beleg nennt die Steuerschuldnerschaft des Leistungsempfängers, weist aber deutsche Umsatzsteuer aus. Gebucht ist die ausgewiesene Steuer. Bitte prüfen Sie den Beleg.",
+   "tax_unverified": "Steuer nicht auf dem Beleg erkannt. Bitte prüfen, ob deutsche Umsatzsteuer ausgewiesen ist oder Reverse Charge gilt.",
+   "tax_inconsistent": "Die Beträge auf dem Beleg ergeben nicht genau die Summe; Rest als durchlaufender Posten gebucht. Bitte prüfen."
+  },
+  "problems": {
+   "unsupported_platform_settlement": "Abrechnungen dieser Plattform werden nicht automatisch gebucht, nur die von Apple und Google. Bitte buchen Sie sie von Hand."
+  },
+  "controlStatuses": {
+   "ok": "Erfüllt",
+   "warning": "Bitte prüfen",
+   "failed": "Nicht erfüllt",
+   "not_applicable": "Nicht zutreffend"
+  },
+  "controls": {
+   "bank_matches_statement": {
+    "title": "Bank stimmt mit dem Kontoauszug",
+    "ok": "Der Stand jedes Bankkontos stimmt an jedem Tag mit dem Kontoauszug überein.",
+    "failed": "Konto {account} weicht ab dem {date} vom Kontoauszug ab.",
+    "not_applicable": "Es ist noch kein Bankkonto mit der Buchhaltung verbunden."
+   },
+   "unbooked_bank_transactions": {
+    "title": "Alle Bankumsätze gebucht",
+    "ok": "Jeder Bankumsatz ist gebucht.",
+    "failed": "{count, plural, one {# Bankumsatz ist} other {# Bankumsätze sind}} noch nicht gebucht."
+   },
+   "unbooked_documents": {
+    "title": "Alle Belege gebucht",
+    "ok": "Jeder Beleg ist gebucht.",
+    "warning": "{count, plural, one {# Beleg ist} other {# Belege sind}} noch nicht gebucht."
+   },
+   "open_item_accounts": {
+    "title": "Offene Posten geklärt",
+    "ok": "Jedes Konto mit offenen Posten steht auf null oder ist erklärt.",
+    "failed": "{count, plural, one {# Konto hat} other {# Konten haben}} offene Posten ohne Erklärung.",
+    "not_applicable": "Auf Konten mit offenen Posten ist noch nichts gebucht."
+   },
+   "unbalanced_entries": {
+    "title": "Vorschläge ausgeglichen",
+    "ok": "Kein Vorschlag hat eine Differenz zwischen Soll und Haben.",
+    "failed": "{count, plural, one {# Vorschlag hat} other {# Vorschläge haben}} eine Differenz zwischen Soll und Haben."
+   },
+   "proposals_waiting": {
+    "title": "Vorschläge geprüft",
+    "ok": "Es warten keine Vorschläge auf Ihre Prüfung.",
+    "warning": "{count, plural, one {# Vorschlag wartet} other {# Vorschläge warten}} auf Ihre Prüfung."
+   },
+   "advisor_differences": {
+    "title": "Abgleich mit der Steuerberaterin",
+    "ok": "Alle Salden stimmen mit der Summen- und Saldenliste der Steuerberaterin überein.",
+    "warning": "{count, plural, one {# Konto weicht} other {# Konten weichen}} von der Summen- und Saldenliste der Steuerberaterin ab.",
+    "not_applicable": "Für diesen Zeitraum liegt keine Summen- und Saldenliste der Steuerberaterin vor."
+   }
+  },
+  "summaries": {
+   "expensePaidByBank": "{amount, number, ::currency/EUR} für {account}, bezahlt über {counter}.",
+   "expenseAgainstOpenItem": "{amount, number, ::currency/EUR} für {account}, gebucht gegen {counter}, bis die Zahlung ausgeglichen ist.",
+   "expenseFromPrepaid": "{amount, number, ::currency/EUR} für {account}, bezahlt aus dem Guthaben auf {counter}.",
+   "expensePaidByShareholder": "{amount, number, ::currency/EUR} für {account}, privat bezahlt von {person}. Die Gesellschaft erstattet den Betrag.",
+   "reverseCharge": "{amount, number, ::currency/EUR} für {account} von einem ausländischen Anbieter, gegen {counter}. Die Umsatzsteuer schulden Sie selbst und ziehen sie als Vorsteuer wieder ab (§ 13b UStG).",
+   "revenue": "Einnahme von {amount, number, ::currency/EUR} auf {account}, gegen {counter}.",
+   "platformReport": "Abrechnung über {counter}: Einnahmen von {amount, number, ::currency/EUR}, abzüglich Gebühren von {fees, number, ::currency/EUR}.",
+   "paymentOut": "Zahlung von {amount, number, ::currency/EUR} von {bank}, gebucht auf {counter}.",
+   "paymentIn": "Zahlungseingang von {amount, number, ::currency/EUR} auf {bank}, gebucht auf {counter}.",
+   "transfer": "{amount, number, ::currency/EUR} von {from} nach {to} umgebucht.",
+   "split": "{amount, number, ::currency/EUR} aufgeteilt auf {count} Konten.",
+   "manual": "Buchung über {amount, number, ::currency/EUR} mit {count, plural, one {# Zeile} other {# Zeilen}}."
+  },
+  "templates": {
+   "incoming_invoice": "Eingangsrechnung",
+   "outgoing_document": "Ausgangsrechnung (Beleg)",
+   "outgoing_invoice": "Ausgangsrechnung aus Digipost",
+   "settlement_report": "Plattform-Abrechnung",
+   "bank_document_payment": "Zahlung zu einem Beleg",
+   "bank_clearing_pair": "Auszahlung oder Abbuchung einer Plattform",
+   "bank_contact_account": "Zahlung über ein Verrechnungskonto",
+   "bank_person_account": "Erstattung an einen Gesellschafter",
+   "bank_own_transfer": "Umbuchung zwischen eigenen Konten",
+   "bank_no_document_rule": "Regel ohne Beleg"
+  },
+  "matchSuggestionReasons": {
+   "same_document": "Rechnung und Zahlung zum selben Beleg",
+   "subset_sum": "Diese Posten ergeben zusammen null"
+  },
+  "common": {
+   "cancel": "Abbrechen"
+  },
+  "pills": {
+   "originPrefix": "Herkunft:",
+   "locked": "Gesperrt"
+  },
+  "periods": {
+   "quarter": "{quarter}. Quartal {year}",
+   "range": "{from} bis {to}",
+   "filing": "{kind} {period}",
+   "filingShort": {
+    "vat_return": "USt-VA",
+    "annual_statement": "Jahresabschluss"
+   }
+  },
+  "filters": {
+   "from": "Von",
+   "to": "Bis",
+   "origin": "Herkunft",
+   "originAll": "Alle",
+   "onlyWarnings": "Nur mit Warnung",
+   "apply": "Filtern",
+   "reset": "Zurücksetzen",
+   "show": "Anzeigen"
+  },
+  "overview": {
+   "heading": "Buchhaltung",
+   "description": "Digipost führt Ihre Bücher nach SKR 04 und schlägt Buchungen vor. Sie prüfen, ändern und bestätigen.",
+   "disabledDescription": "Die Buchhaltung ist für diesen Arbeitsbereich noch nicht aktiviert.",
+   "newEntry": "Neue Buchung",
+   "journal": "Journal ansehen",
+   "waiting": "{count, plural, one {# Vorschlag wartet} other {# Vorschläge warten}} auf Ihre Prüfung",
+   "noneWaiting": "Keine Vorschläge offen",
+   "waitingHint": "Digipost schlägt für jeden Beleg und jeden Bankumsatz eine Buchung vor. Gebucht wird erst, wenn Sie bestätigen.",
+   "reviewNow": "Jetzt prüfen",
+   "tilesHeading": "Auf einen Blick",
+   "bankTile": "Bank stimmt?",
+   "bankYes": "Ja",
+   "bankNo": "Nein, es gibt eine Abweichung",
+   "bankUnknown": "Noch nicht prüfbar",
+   "openItemsTile": "Offene-Posten-Konten",
+   "openItemsValue": "{count, plural, =0 {Alle stehen auf null} one {# Konto nicht auf null} other {# Konten nicht auf null}}",
+   "openItemsExplained": "davon {count} erklärt",
+   "vatTile": "USt-VA",
+   "vatPayable": "Zahllast {amount}",
+   "vatRefund": "Erstattung {amount}",
+   "vatHint": "Vorschau aus den gebuchten Buchungen des laufenden Zeitraums.",
+   "periodsHeading": "Zeiträume {year}",
+   "periodsHintMonth": "Ein Eintrag je Monat, so wie Sie die Umsatzsteuer-Voranmeldung abgeben.",
+   "periodsHintQuarter": "Ein Eintrag je Quartal, so wie Sie die Umsatzsteuer-Voranmeldung abgeben.",
+   "year": "Jahr",
+   "noPeriods": "In diesem Jahr gibt es noch keinen Zeitraum ab dem Startdatum.",
+   "allChecksOk": "Alle Prüfungen erfüllt.",
+   "nothingBooked": "Noch nichts gebucht.",
+   "stillOpen": "Noch offen:",
+   "counts": "{booked} gebucht, {proposed} Vorschläge",
+   "checkShort": {
+    "bank_matches_statement": "Bank weicht vom Kontoauszug ab",
+    "unbooked_bank_transactions": "Bankumsätze nicht gebucht",
+    "unbooked_documents": "Belege nicht gebucht",
+    "open_item_accounts": "Offene Posten nicht geklärt",
+    "unbalanced_entries": "Vorschläge mit Differenz",
+    "proposals_waiting": "Vorschläge warten",
+    "advisor_differences": "Abweichungen zur Steuerberaterin"
+   },
+   "closingLink": "Zum Abschluss",
+   "closingHint": "Dort prüfen Sie einen Monat auf Vollständigkeit und laden das Paket für die Steuerberaterin herunter."
+  },
+  "enable": {
+   "heading": "Buchhaltung aktivieren",
+   "what": "Digipost legt einen Kontenplan nach SKR 04 an und schlägt ab dem Startdatum für jeden Beleg und jeden Bankumsatz eine Buchung vor.",
+   "control": "Gebucht wird erst, wenn Sie einen Vorschlag bestätigen, und Sie können alles ändern, bis Sie eine Meldung als eingereicht markieren.",
+   "startDate": "Startdatum",
+   "startDateHint": "Ab diesem Tag bucht Digipost. Meist der Beginn des Geschäftsjahres oder der Tag der Gründung.",
+   "vatPeriod": "Umsatzsteuer-Voranmeldung",
+   "month": "Monatlich",
+   "monthHint": "Üblich in den ersten beiden Jahren nach der Gründung und bei höherer Umsatzsteuer.",
+   "quarter": "Vierteljährlich",
+   "quarterHint": "Wenn das Finanzamt es erlaubt, meist bei geringer Umsatzsteuer im Vorjahr.",
+   "vatBasis": "Versteuerung",
+   "soll": "Soll-Versteuerung",
+   "sollHint": "Die Umsatzsteuer entsteht mit der Rechnung. Das ist der Normalfall.",
+   "ist": "Ist-Versteuerung",
+   "istHint": "Die Umsatzsteuer entsteht erst, wenn der Kunde zahlt. Nur mit Genehmigung des Finanzamts.",
+   "submit": "Buchhaltung aktivieren",
+   "pending": "Wird aktiviert …",
+   "noPermission": "Nur Administratoren können die Buchhaltung aktivieren."
+  },
+  "sync": {
+   "button": "Vorschläge aktualisieren",
+   "pending": "Wird aktualisiert …",
+   "result": "{created, plural, =0 {Keine neuen Vorschläge} one {# neuer Vorschlag} other {# neue Vorschläge}}, {updated} aktualisiert, {unproposed} ohne Vorschlag.",
+   "deferred": "Weitere Belege folgen beim nächsten Durchlauf."
+  },
+  "queue": {
+   "heading": "Zu prüfen",
+   "description": "Digipost hat diese Buchungen vorbereitet. Prüfen Sie sie und buchen Sie mit einem Klick.",
+   "filtersLabel": "Vorschläge filtern",
+   "safe": "Sicher (Vorlage oder Regel)",
+   "safeHint": "Aus einer festen Vorlage oder einer Ihrer Regeln, ausgeglichen und ohne Warnung.",
+   "review": "Bitte ansehen",
+   "reviewHint": "Von der KI vorgeschlagen, von Hand angelegt oder mit einer Warnung.",
+   "problems": "Probleme",
+   "problemsHint": "Hierfür gibt es noch keinen Vorschlag. Legen Sie die Buchung selbst an.",
+   "problemTransaction": "Bankumsatz ohne Buchung",
+   "problemDocument": "Beleg ohne Buchung",
+   "problemDismissed": "Der Vorschlag dafür wurde verworfen.",
+   "createEntry": "Buchung anlegen",
+   "openDocument": "Beleg ansehen",
+   "select": "{text} auswählen",
+   "book": "Buchen",
+   "edit": "Bearbeiten",
+   "dismiss": "Verwerfen",
+   "dismissConfirm": "Diesen Vorschlag verwerfen? Digipost schlägt ihn danach nicht erneut vor. Im Journal können Sie ihn wiederherstellen.",
+   "dismissYes": "Ja, verwerfen",
+   "why": "Warum?",
+   "templateReason": "Vorlage: {template}",
+   "ruleReason": "Nach einer Ihrer Regeln vorgeschlagen.",
+   "showLines": "Buchungssatz anzeigen",
+   "warningsLabel": "Warnungen",
+   "selectSafe": "Alle sicheren auswählen ({count})",
+   "bookSelected": "{count, plural, one {# Buchung buchen} other {# Buchungen buchen}} ({sum})",
+   "clearSelection": "Auswahl aufheben",
+   "selectionHasUnsafe": "Die Auswahl enthält Vorschläge, die Sie ansehen sollten.",
+   "bulkResult": "{booked, plural, one {# Buchung gebucht} other {# Buchungen gebucht}}{failed, plural, =0 {.} other {, # nicht gebucht.}}",
+   "emptyHeading": "Alles geprüft",
+   "empty": "Es warten keine Vorschläge und keine Probleme.",
+   "emptyFilteredHeading": "Nichts gefunden",
+   "emptyFiltered": "Für diese Filter gibt es nichts zu prüfen.",
+   "emptyNext": "Zur Übersicht"
+  },
+  "keyboard": {
+   "button": "Tastenkürzel",
+   "heading": "Tastenkürzel",
+   "keys": {
+    "j": "j",
+    "k": "k",
+    "enter": "Eingabe",
+    "e": "e",
+    "x": "x",
+    "help": "?"
+   },
+   "j": "Nächster Vorschlag",
+   "k": "Vorheriger Vorschlag",
+   "enter": "Markierten Vorschlag buchen",
+   "e": "Markierten Vorschlag bearbeiten",
+   "x": "Markierten Vorschlag auswählen",
+   "help": "Diese Hilfe ein- oder ausblenden",
+   "note": "Die Kürzel sind aus, solange Sie in einem Eingabefeld schreiben."
+  },
+  "warningLabels": {
+   "no_tax_breakdown": "Keine Steueraufteilung",
+   "amount_differs_from_payment": "Betrag weicht ab",
+   "possible_pass_through": "Durchlaufender Posten?",
+   "foreign_supplier_with_vat": "Ausland mit deutscher USt",
+   "duplicate_suspect": "Möglicherweise doppelt",
+   "ai_unavailable": "KI nicht erreichbar",
+   "reverse_charge_conflict": "§ 13b und deutsche USt",
+   "tax_unverified": "Steuer nicht erkannt",
+   "tax_inconsistent": "Beträge ergeben nicht die Summe"
+  },
+  "lines": {
+   "caption": "Buchungssatz",
+   "account": "Konto",
+   "debit": "Soll",
+   "credit": "Haben",
+   "noAccount": "Konto fehlt",
+   "taxLine": "Steuer aus Zeile {position}, automatisch",
+   "balanced": "Ausgeglichen",
+   "difference": "Differenz {amount}"
+  },
+  "editor": {
+   "back": "Zurück zu Zu prüfen",
+   "headingNew": "Neue Buchung",
+   "headingCorrection": "Korrektur buchen",
+   "correctionText": "Korrektur zu: {text} ({date})",
+   "correctionNote": "Die Zeilen der ursprünglichen Buchung sind umgekehrt. Ergänzen Sie die richtige Buchung und buchen Sie beides zusammen in einem offenen Zeitraum.",
+   "modesLabel": "Art der Buchung",
+   "modes": {
+    "expense": "Ausgabe",
+    "income": "Einnahme",
+    "transfer": "Umbuchung",
+    "split": "Aufteilen",
+    "expert": "Experte"
+   },
+   "noTemplate": "Diese Buchung passt in keine Vorlage. Bearbeiten Sie sie im Expertenmodus weiter.",
+   "whatFor": "Wofür?",
+   "accountPlaceholder": "Konto suchen, Name oder Nummer",
+   "accountList": "Konten",
+   "noAccountFound": "Kein passendes Konto.",
+   "amount": "Betrag",
+   "amountModeLabel": "Betrag ist",
+   "reverseChargeNet": "Bei Reverse Charge ist der Betrag immer der Rechnungsbetrag ohne Steuer.",
+   "tax": "Steuer",
+   "taxNone": "Ohne Steuerschlüssel",
+   "taxNoneHint": "Es wird keine Steuer gebucht und nichts in der Umsatzsteuer-Voranmeldung gemeldet.",
+   "paidVia": "Bezahlt über",
+   "receivedOn": "Eingegangen auf",
+   "choose": "Bitte wählen",
+   "groupBank": "Bank",
+   "groupOpenItems": "Verrechnungskonten und Gesellschafter",
+   "groupOpen": "Noch nicht bezahlt",
+   "groupOther": "Anderes Konto",
+   "openPayable": "Noch offen, als Verbindlichkeit ({number})",
+   "openReceivable": "Noch offen, als Forderung ({number})",
+   "from": "Von Konto",
+   "to": "Auf Konto",
+   "transferHint": "Geld oder ein Betrag wechselt nur das Konto, zum Beispiel eine Aufladung des Meta-Guthabens.",
+   "direction": "Richtung",
+   "total": "Gesamtbetrag",
+   "splitRows": "Aufteilung",
+   "rowAccount": "Konto der Position {n}",
+   "rowAmount": "Betrag der Position {n}",
+   "rowTax": "Steuer der Position {n}",
+   "addRow": "Position hinzufügen",
+   "removeRow": "Position {n} entfernen",
+   "remaining": "Noch zu verteilen: {amount}",
+   "expert": {
+    "account": "Konto",
+    "debit": "Soll",
+    "credit": "Haben",
+    "taxCode": "Steuerschlüssel",
+    "text": "Text",
+    "actions": "Aktionen",
+    "rowAccount": "Konto der Zeile {n}",
+    "rowDebit": "Soll der Zeile {n}",
+    "rowCredit": "Haben der Zeile {n}",
+    "rowTax": "Steuerschlüssel der Zeile {n}",
+    "rowText": "Text der Zeile {n}",
+    "addRow": "Zeile hinzufügen",
+    "removeRow": "Zeile {n} entfernen",
+    "netHint": "Beträge mit Steuerschlüssel sind Nettobeträge. Die Steuerzeile erzeugt Digipost selbst. Eingabe in der letzten Zeile fügt eine Zeile hinzu."
+   },
+   "documentDate": "Belegdatum",
+   "bookingDate": "Buchungsdatum",
+   "serviceDate": "Leistungsdatum",
+   "text": "Buchungstext",
+   "preview": "So wird gebucht",
+   "issues": {
+    "account_missing": "Bitte wählen Sie für jede Zeile ein Konto.",
+    "amount_missing": "Bitte geben Sie einen Betrag ein.",
+    "remaining": "Es sind noch {amount} zu verteilen.",
+    "unbalanced": "Soll und Haben sind nicht gleich.",
+    "too_few_lines": "Eine Buchung braucht mindestens zwei Zeilen."
+   },
+   "learnRule": "Für {name} künftig so vorschlagen",
+   "learnRuleHint": "Digipost legt dafür eine Regel an oder passt die bestehende an.",
+   "reason": "Grund der Änderung",
+   "reasonHint": "Pflicht bei einer gebuchten Buchung. Der Grund erscheint im Verlauf.",
+   "reasonMissing": "Bitte geben Sie einen Grund an.",
+   "saveProposal": "Als Vorschlag speichern",
+   "book": "Buchen",
+   "pending": "Wird gespeichert …",
+   "saveChanges": "Änderungen speichern",
+   "unbook": "Buchung zurücknehmen",
+   "delete": "Löschen",
+   "deleteConfirm": "Diese Buchung löschen? Sie bleibt im Verlauf nachvollziehbar.",
+   "deleteYes": "Ja, löschen",
+   "dismiss": "Verwerfen",
+   "restore": "Wiederherstellen",
+   "dismissedNote": "Dieser Vorschlag wurde verworfen. Digipost schlägt ihn nicht erneut vor.",
+   "saved": "Gespeichert.",
+   "stale": "Wurde inzwischen geändert.",
+   "reload": "Neu laden",
+   "lockedChip": "Gesperrt durch {filing}",
+   "lockedText": "Für diesen Zeitraum ist die Meldung eingereicht. Ändern Sie die Buchung über eine Korrekturbuchung in einem offenen Zeitraum oder über eine berichtigte Meldung.",
+   "correct": "Korrektur buchen",
+   "periods": "Zeiträume und Meldungen",
+   "correctionFiling": "Berichtigte Meldung",
+   "correctionFilingOption": "Berichtigung zu {filing}",
+   "correctionFilingHint": "Die Buchung liegt in einem gemeldeten Zeitraum. Sie gehört zu der berichtigten Meldung, die Sie hier wählen.",
+   "printedTaxIgnored": "Die auf dem Beleg ausgewiesene Steuer ist so hoch wie der Bruttobetrag und wird nicht übernommen. Digipost rechnet die Steuer aus dem Betrag. Bitte prüfen Sie den Beleg."
+  },
+  "source": {
+   "heading": "Herkunft der Buchung",
+   "document": "Beleg",
+   "transaction": "Bankumsatz",
+   "none": "Diese Buchung hat keinen Beleg und keinen Bankumsatz, zum Beispiel eine Einlage oder eine Umbuchung.",
+   "sender": "Absender",
+   "date": "Datum",
+   "invoiceNumber": "Rechnungsnummer",
+   "total": "Betrag",
+   "net": "Netto",
+   "tax": "Steuer",
+   "rate": "{rate} %",
+   "rateAmounts": "netto {net}, Steuer {tax}",
+   "notPrinted": "nicht angegeben",
+   "passThrough": "Durchlaufende Posten",
+   "serviceDate": "Leistungsdatum",
+   "servicePeriod": "Leistungszeitraum",
+   "periodRange": "{from} bis {to}",
+   "reverseCharge": "Auf dem Beleg steht ein Hinweis auf Reverse Charge (§ 13b UStG).",
+   "openDocument": "Dokument öffnen",
+   "openPdf": "PDF ansehen",
+   "amount": "Betrag",
+   "bankAccount": "Konto",
+   "counterparty": "Gegenpartei",
+   "purpose": "Verwendungszweck",
+   "documentMissing": "Beleg gelöscht. Der verknüpfte Beleg existiert nicht mehr, die Buchung bleibt erhalten.",
+   "transactionMissing": "Der verknüpfte Bankumsatz existiert nicht mehr. Die Buchung bleibt erhalten."
+  },
+  "history": {
+   "heading": "Verlauf ({count})",
+   "empty": "Noch kein Verlauf.",
+   "byAt": "von {who}, {at}",
+   "system": "Digipost",
+   "unknownUser": "einem ehemaligen Mitglied",
+   "reason": "Grund: {reason}",
+   "before": "Vorher",
+   "after": "Jetzt",
+   "nothing": "nichts",
+   "linesUnchanged": "Zeilen unverändert."
+  },
+  "journal": {
+   "heading": "Journal",
+   "description": "Alle Buchungen und Vorschläge. Vorschläge sind gestrichelt, gesperrte Buchungen tragen ein Schloss.",
+   "filtersLabel": "Journal filtern",
+   "caption": "Buchungen",
+   "status": "Status",
+   "statusAll": "Alle",
+   "account": "Konto",
+   "accountAll": "Alle Konten",
+   "changedSince": "Geändert seit Übergabe",
+   "changedSinceNone": "Nicht filtern",
+   "changedSinceOption": "Übergabe vom {date} ({period})",
+   "columns": {
+    "date": "Datum",
+    "text": "Text",
+    "debit": "Soll",
+    "credit": "Haben",
+    "amount": "Betrag",
+    "origin": "Herkunft",
+    "status": "Status"
+   },
+   "empty": "Für diese Filter gibt es keine Buchungen.",
+   "shown": "{count, plural, one {# Buchung} other {# Buchungen}} angezeigt",
+   "loadMore": "Mehr laden"
+  },
+  "accounts": {
+   "heading": "Konten",
+   "description": "Alle Konten mit ihren Salden, gruppiert wie in einer Summen- und Saldenliste. Jeder Betrag führt zu den Buchungen dahinter.",
+   "newEntry": "+ Buchung",
+   "filtersLabel": "Zeitraum wählen",
+   "showEmpty": "Konten ohne Bewegung zeigen",
+   "modeLabel": "Ansicht",
+   "modes": {
+    "einfach": "Einfach",
+    "soll-haben": "Soll/Haben"
+   },
+   "modeHintSimple": "Rein erhöht den Stand eines Kontos, raus verringert ihn. Der Stand zeigt, was auf dem Konto ist, schuldet oder verdient wurde.",
+   "modeHintExpert": "Die Spalten einer Summen- und Saldenliste aus DATEV: Eröffnungsbestand, Soll, Haben und Saldo mit S oder H.",
+   "empty": "In diesem Zeitraum ist noch nichts gebucht.",
+   "whatIsThis": "Was wird auf {name} gebucht?",
+   "columns": {
+    "account": "Konto",
+    "status": "Status",
+    "in": "Rein",
+    "out": "Raus",
+    "balance": "Stand",
+    "opening": "EB",
+    "debit": "Soll",
+    "credit": "Haben",
+    "saldo": "Saldo"
+   },
+   "groupTotal": "Summe {group}",
+   "mixedGroup": "nicht addierbar",
+   "balanced": "Summe Soll {debit} = Summe Haben {credit}",
+   "unbalanced": "Summe Soll {debit}, Summe Haben {credit}: Differenz {difference}",
+   "chips": {
+    "bankOk": "Stimmt mit Kontoauszug",
+    "bankDiff": "Abweichung zum Kontoauszug",
+    "bankDiffSince": "Abweichung seit {date}",
+    "itemsZero": "Ausgeglichen",
+    "itemsExplained": "Erklärt",
+    "itemsOpen": "{count, plural, one {# offener Posten} other {# offene Posten}}"
+   }
+  },
+  "sheet": {
+   "caption": "Kontenblatt {number} {name}",
+   "columns": {
+    "date": "Datum",
+    "text": "Text",
+    "counter": "Gegenkonto",
+    "document": "Beleg",
+    "debit": "Soll",
+    "credit": "Haben",
+    "balance": "Saldo"
+   },
+   "opening": "Anfangsbestand",
+   "taxLine": "Steuer",
+   "documentLink": "Beleg",
+   "notCounted": "nicht eingerechnet",
+   "totals": "Summe im Zeitraum",
+   "back": "Alle Konten",
+   "archived": "archiviert",
+   "balanceToday": "Stand heute",
+   "balanceAt": "Stand am {date}",
+   "tabsLabel": "Ansicht des Kontos",
+   "tabs": {
+    "sheet": "Kontenblatt",
+    "openItems": "Offene Posten"
+   },
+   "filtersLabel": "Zeitraum wählen",
+   "proposalsLabel": "Vorschläge",
+   "onlyBooked": "Nur gebuchte",
+   "withProposals": "Vorschläge einrechnen",
+   "empty": "In diesem Zeitraum gibt es auf diesem Konto keine Buchung.",
+   "proposalsCounted": "Vorschläge sind eingerechnet. Der Saldo zeigt, wie das Konto nach dem Buchen aussähe.",
+   "proposalsNotCounted": "Vorschläge sind gestrichelt und zählen erst, wenn Sie sie buchen."
+  },
+  "openItems": {
+   "types": {
+    "prepaid": {
+     "title": "Verrechnungskonto eines Anbieters",
+     "text": "Hier treffen Zahlungen und Rechnungen eines Anbieters aufeinander. Bei Guthaben (zum Beispiel Meta) zahlen Sie zuerst und die Rechnungen verbrauchen es. Bei Abbuchungen nach Schwelle (zum Beispiel Google Ads) wird zuerst abgebucht und die Rechnung kommt später. Ausgeglichen ist das Konto, wenn beides zusammen null ergibt. Ein echtes Restguthaben erklären Sie."
+    },
+    "receivable": {
+     "title": "Forderung",
+     "text": "Hier steht, was Ihnen jemand schuldet, zum Beispiel eine Plattform wie Apple oder Google Play bis zur Auszahlung oder ein Kunde bis zur Zahlung. Die Zahlung gleicht die Forderung aus. Eine Auszahlung, die noch kommt, erklären Sie als Rest."
+    },
+    "shareholder": {
+     "title": "Konto eines Gesellschafters",
+     "text": "Hier steht, was die Gesellschaft einem Gesellschafter schuldet, weil er etwas privat bezahlt hat (zum Beispiel den Notar). Die Erstattung von der Bank gleicht es aus."
+    },
+    "payable": {
+     "title": "Verbindlichkeiten",
+     "text": "Hier stehen Rechnungen, bis sie bezahlt sind. Rechnung und Zahlung zum selben Beleg gleichen sich aus."
+    },
+    "generic": {
+     "title": "Konto mit offenen Posten",
+     "text": "Posten, die sich gegenseitig aufheben, gleichen Sie hier aus. Was übrig bleibt, ist entweder noch offen oder Sie erklären es."
+    }
+   },
+   "balance": "Saldo",
+   "suggestionsHeading": "Vorschläge",
+   "suggestionTitle": "{count, plural, one {Dieser Posten gleicht sich aus} other {Diese # Posten gleichen sich aus}}",
+   "applySuggestion": "Übernehmen",
+   "openHeading": "Offen ({count})",
+   "selectAll": "Alle auswählen",
+   "noneOpen": "Keine offenen Posten.",
+   "selectLine": "{text} über {amount} auswählen",
+   "selectionLabel": "Auswahl ausgleichen",
+   "selected": "{count, plural, =0 {Nichts ausgewählt} one {# Posten ausgewählt} other {# Posten ausgewählt}}",
+   "selectHint": "Wählen Sie Posten, die zusammengehören.",
+   "zeroReached": "Die Auswahl ergibt null. Sie können ausgleichen.",
+   "remaining": "Noch {amount} bis null. Wählen Sie weitere Posten oder erklären Sie den Rest.",
+   "match": "Ausgleichen",
+   "explain": "Rest erklären",
+   "explainSubmit": "Erklärung speichern",
+   "noteLabel": "Warum bleibt dieser Betrag?",
+   "notePlaceholder": "Zum Beispiel: Restguthaben bei Meta oder Auszahlung von Apple im November erwartet",
+   "noteHint": "Die Erklärung ist Pflicht und steht später im Abgleich.",
+   "matchesHeading": "Ausgeglichen und erklärt ({count})",
+   "noMatches": "Noch nichts ausgeglichen.",
+   "undo": "Ausgleich aufheben"
+  },
+  "reports": {
+   "heading": "Auswertungen",
+   "description": "Umsatzsteuer-Voranmeldung, Abgleich mit der Steuerberaterin und Ihre Meldungen.",
+   "tabsLabel": "Auswertungen",
+   "tabs": {
+    "susa": "Summen und Salden",
+    "ust": "USt-VA",
+    "abgleich": "Abgleich Steuerberaterin",
+    "zeitraeume": "Zeiträume und Meldungen"
+   }
+  },
+  "vat": {
+   "caption": "Umsatzsteuer-Voranmeldung",
+   "heading": "Vorschau",
+   "period": "Zeitraum",
+   "columns": {
+    "kennzahl": "Kz",
+    "label": "Bezeichnung",
+    "base": "Bemessungsgrundlage",
+    "tax": "Steuer"
+   },
+   "entryCount": "{count, plural, =0 {Keine Buchung} one {# Buchung} other {# Buchungen}}",
+   "noEntries": "Keine Buchung in diesem Zeitraum.",
+   "payable": "Zahllast",
+   "refund": "Erstattung",
+   "roundingHint": "Beträge auf den Cent genau. In der Meldung rundet das Finanzamt die Bemessungsgrundlagen auf volle Euro.",
+   "empty": "In diesem Zeitraum ist nichts gebucht, das in die Voranmeldung gehört.",
+   "submitted": "Eingereicht am {date}",
+   "notSubmitted": "Noch nicht eingereicht",
+   "basisHeading": "Besteuerung: {basis}",
+   "basisSoll": "Die Vorschau rechnet nach dem Buchungsdatum: Eine Rechnung zählt in dem Zeitraum, in dem sie gebucht ist, egal wann sie bezahlt wurde.",
+   "basisIstNotApplied": "Sie haben die Ist-Versteuerung eingestellt. Die Vorschau rechnet in dieser Version trotzdem nach dem Buchungsdatum, nicht nach dem Zahlungseingang. Wurde eine Rechnung in einem anderen Zeitraum bezahlt, weicht die Vorschau von Ihrer Meldung ab.",
+   "proposalsMissing": "{count, plural, one {# Vorschlag} other {# Vorschläge}} in diesem Zeitraum {count, plural, one {ist} other {sind}} noch nicht gebucht und nicht enthalten.",
+   "reviewProposals": "Jetzt prüfen",
+   "changeBasis": "In den Einstellungen ändern"
+  },
+  "advisor": {
+   "intro": "Laden Sie die Summen- und Saldenliste Ihrer Steuerberaterin hoch. Digipost vergleicht sie Konto für Konto mit den eigenen Salden desselben Zeitraums.",
+   "totalsOnly": "Verglichen werden nur die Salden je Konto, nicht die einzelnen Buchungen. Bei einer Abweichung zeigt Digipost die eigenen Buchungen des Kontos, dort finden Sie den Unterschied.",
+   "uploadHeading": "Summen- und Saldenliste hochladen",
+   "uploadHint": "Als CSV-Datei aus DATEV (Semikolon getrennt). Wählen Sie genau den Zeitraum, den die Liste abdeckt.",
+   "file": "Datei",
+   "upload": "Hochladen und vergleichen",
+   "uploading": "Wird gelesen...",
+   "uploadsHeading": "Hochgeladene Listen",
+   "uploadMeta": "{file}, hochgeladen am {date}, {count, plural, one {# Konto} other {# Konten}}",
+   "delete": "Löschen",
+   "deleteConfirm": "Die Liste {file} löschen? Ihre eigenen Buchungen bleiben unverändert.",
+   "noUploads": "Noch keine Liste hochgeladen.",
+   "comparisonHeading": "Vergleich",
+   "allEqual": "Alle Konten stimmen überein.",
+   "differences": "{count, plural, one {# Konto weicht ab} other {# Konten weichen ab}}.",
+   "filterLabel": "Zeilen",
+   "showAll": "Alle Konten",
+   "onlyDifferences": "Nur Abweichungen",
+   "caption": "Vergleich mit der Steuerberaterin",
+   "columns": {
+    "account": "Konto",
+    "ours": "Digipost",
+    "theirs": "Steuerberaterin",
+    "difference": "Differenz"
+   },
+   "equal": "Stimmt überein",
+   "noRows": "Keine Zeilen für diese Auswahl.",
+   "noLines": "Digipost hat auf diesem Konto im Zeitraum keine Buchung. Vermutlich fehlt hier eine Buchung.",
+   "openSheet": "Kontenblatt öffnen",
+   "signHint": "Salden mit S (Soll) oder H (Haben), wie in DATEV. Die Differenz ist Digipost minus Steuerberaterin.",
+   "ownList": "Eigene Summen- und Saldenliste"
+  },
+  "filing": {
+   "intro": "Ein Zeitraum bleibt änderbar, bis Sie seine Meldung als eingereicht markieren. Danach sind seine Buchungen gesperrt.",
+   "vatHeading": "Umsatzsteuer-Voranmeldungen",
+   "annualHeading": "Jahresabschluss",
+   "annualHint": "Ist der Jahresabschluss eingereicht, ist das ganze Jahr gesperrt.",
+   "annualTitle": "Jahresabschluss {period}",
+   "submittedPill": "Eingereicht am {date}",
+   "correctionDraft": "Berichtigung in Arbeit",
+   "protocolPayable": "Zahllast laut Protokoll: {amount}",
+   "protocolRefund": "Erstattung laut Protokoll: {amount}",
+   "markSubmitted": "Als eingereicht markieren",
+   "markCorrectionSubmitted": "Berichtigung als eingereicht markieren",
+   "correctionButton": "Berichtigte Meldung anlegen",
+   "confirmHeading": "{period} als eingereicht markieren",
+   "notByDigipost": "Digipost reicht nichts beim Finanzamt ein. Sie halten hier fest, dass die Meldung abgegeben wurde.",
+   "lockCount": "{count, plural, =0 {Im Zeitraum {period} ist nichts gebucht, gesperrt wird trotzdem der ganze Zeitraum.} one {# gebuchte Buchung aus {period} wird gesperrt.} other {# gebuchte Buchungen aus {period} werden gesperrt.}}",
+   "proposalsNotLocked": "{count, plural, one {# Vorschlag ist} other {# Vorschläge sind}} noch nicht gebucht. In einem gesperrten Zeitraum können Sie {count, plural, one {ihn} other {sie}} nicht mehr buchen.",
+   "submittedOn": "Eingereicht am",
+   "amountKind": "Ergebnis laut Protokoll",
+   "payable": "Zahllast",
+   "refund": "Erstattung",
+   "amount": "Betrag (optional)",
+   "previewPayable": "Die Vorschau ergibt eine Zahllast von {amount}.",
+   "previewRefund": "Die Vorschau ergibt eine Erstattung von {amount}.",
+   "amountDiffers": "Der Betrag weicht um {difference} von der Vorschau ab. Prüfen Sie, ob Ihre Steuerberaterin andere Zahlen gemeldet hat.",
+   "confirmCheckbox": "Ich habe die Meldung beim Finanzamt abgegeben.",
+   "confirmCheckboxAnnual": "Der Jahresabschluss ist beim Finanzamt abgegeben.",
+   "submit": "Als eingereicht markieren",
+   "cancel": "Abbrechen",
+   "correctionHeading": "Eingereichten Zeitraum korrigieren",
+   "correctionFilingTitle": "Berichtigte Meldung",
+   "correctionFilingText": "Empfohlen, wenn sich die Umsatzsteuer dieses Zeitraums ändert. Digipost legt eine berichtigte Meldung an. Solange sie offen ist, buchen Sie Korrekturen mit Datum in diesem Zeitraum. Die ursprünglichen Buchungen bleiben gesperrt. Mit der neuen Einreichung wird auch die Korrektur gesperrt.",
+   "correctionCreate": "Berichtigte Meldung anlegen",
+   "correctionLaterTitle": "Korrektur im nächsten offenen Zeitraum",
+   "correctionLaterText": "Die ursprüngliche Buchung bleibt unverändert. Öffnen Sie sie und wählen Sie \"Korrektur buchen\": Digipost bucht die Umkehrung und die richtige Buchung im ersten offenen Zeitraum. Nach dem eingereichten Jahresabschluss ist das der einzige Weg.",
+   "correctionLaterLink": "Buchungen dieses Zeitraums ansehen",
+   "correctionAdvisor": "Welcher Weg richtig ist, klären Sie im Zweifel mit Ihrer Steuerberaterin."
+  },
+  "handover": {
+   "button": "An Steuerberaterin übergeben",
+   "noteLabel": "Notiz zur Übergabe (optional)",
+   "notePlaceholder": "Zum Beispiel: Paket per E-Mail geschickt, Frage zu Musterbank offen",
+   "hint": "Die Übergabe ist nur eine Markierung, nichts wird gesperrt. Danach sehen Sie, was sich seitdem geändert hat.",
+   "submit": "Übergabe festhalten",
+   "cancel": "Abbrechen",
+   "done": "Übergeben am {date}."
+  },
+  "settings": {
+   "heading": "Einstellungen",
+   "description": "Zeitraum, Kontenplan und Regeln Ihrer Buchhaltung.",
+   "tabsLabel": "Einstellungen",
+   "tabs": {
+    "allgemein": "Allgemein",
+    "kontenplan": "Kontenplan",
+    "regeln": "Regeln"
+   },
+   "generalHeading": "Allgemein",
+   "istNotApplied": "Hinweis: Die USt-VA-Vorschau rechnet in dieser Version auch bei Ist-Versteuerung nach dem Buchungsdatum.",
+   "save": "Speichern",
+   "saved": "Gespeichert.",
+   "chartSyncHeading": "Kontenplan aktualisieren",
+   "chartSyncHint": "Legt für neue Bankkonten, Plattformen und Verrechnungskonten das passende Konto an. Bestehende Konten bleiben unverändert.",
+   "chartSync": "Kontenplan aktualisieren",
+   "chartSynced": "{count, plural, one {# Konto} other {# Konten}} im Kontenplan.",
+   "disableHeading": "Buchhaltung ausschalten",
+   "disableHint": "Blendet die Buchhaltung für diesen Arbeitsbereich aus. Alle Buchungen, Konten und Meldungen bleiben gespeichert und sind wieder da, wenn Sie sie erneut aktivieren.",
+   "disable": "Buchhaltung ausschalten",
+   "disableConfirm": "Wirklich ausschalten? Es wird nichts gelöscht, aber bis zur erneuten Aktivierung schlägt Digipost keine Buchungen mehr vor.",
+   "disableSubmit": "Ja, ausschalten",
+   "taxBackfillHeading": "Steuerdaten alter Belege nachträglich erkennen",
+   "taxBackfillHint": "Belege, die vor der Erkennung von Steuersätzen verarbeitet wurden, haben keine Steueraufteilung. Dafür wird der bereits erkannte Text von bis zu {max} Rechnungen einmal an die KI geschickt; eingebettete E-Rechnungsdaten (ZUGFeRD) werden ohne KI gelesen. Nur die Steuerangaben werden ergänzt, nichts anderes am Beleg ändert sich, und unbearbeitete Vorschläge werden danach aktualisiert.",
+   "taxBackfillCandidates": "{count, plural, =0 {Keine älteren Belege ohne Steuerdaten.} one {# älterer Beleg ohne Steuerdaten.} other {# ältere Belege ohne Steuerdaten.}}",
+   "taxBackfill": "Steuerdaten nachträglich erkennen",
+   "taxBackfillQueued": "{count, plural, =0 {Es gibt keine Belege mehr, die ausgelesen werden müssen.} one {# Beleg wird nachträglich ausgelesen.} other {# Belege werden nachträglich ausgelesen.}}",
+   "taxBackfillRemaining": "{count, plural, one {Danach bleibt # Beleg für einen weiteren Durchgang.} other {Danach bleiben # Belege für einen weiteren Durchgang.}}",
+   "taxBackfillFailed": "Das hat nicht geklappt. Bitte versuchen Sie es erneut."
+  },
+  "chart": {
+   "intro": "{count, plural, one {# Konto} other {# Konten}} nach SKR 04. Nummern ändern sich nie, damit Buchungen ihr Konto behalten.",
+   "showArchived": "Archivierte zeigen ({count})",
+   "new": "Neues Konto",
+   "createHeading": "Neues Konto",
+   "number": "Nummer",
+   "name": "Name",
+   "numberHint": "Vier bis acht Ziffern nach SKR 04. Freie Bereiche: 1370 bis 1379 für Plattformen, 1461 bis 1499 für Verrechnungskonten von Anbietern, 3511 bis 3519 für Gesellschafter.",
+   "ownerType": "Gehört zu",
+   "noOwner": "Niemandem (normales Konto)",
+   "owner": {
+    "bank_account": "Bankkonto",
+    "contact": "Kontakt",
+    "platform": "Plattform",
+    "person": "Name der Person"
+   },
+   "personPlaceholder": "Zum Beispiel: Erika",
+   "chooseOwner": "Bitte wählen",
+   "kind": "Art",
+   "group": "Gruppe",
+   "openItems": "Offene Posten führen",
+   "openItemsHint": "Bei Konten mit offenen Posten gleichen Sie Rechnungen und Zahlungen gegeneinander aus. Das Konto soll auf null stehen oder erklärt sein.",
+   "description": "Kurze Erklärung",
+   "descriptionPlaceholder": "Ein Satz: Was wird hier gebucht?",
+   "create": "Konto anlegen",
+   "edit": "Bearbeiten",
+   "editLabel": "Konto {number} bearbeiten",
+   "save": "Speichern",
+   "archive": "Archivieren",
+   "restore": "Wiederherstellen",
+   "archived": "Archiviert",
+   "openItemsBadge": "Offene Posten",
+   "ownerLabel": "{type}: {owner}"
+  },
+  "rules": {
+   "intro": "Regeln entscheiden, wie Digipost Belege und Bankumsätze eines Kontakts oder einer Gegenpartei vorschlägt. Sie entstehen beim Buchen mit \"Als Regel speichern\" oder hier von Hand.",
+   "new": "Neue Regel",
+   "createHeading": "Neue Regel",
+   "editHeading": "Regel bearbeiten",
+   "contact": "Kontakt",
+   "noContact": "Kein Kontakt",
+   "pattern": "Gegenpartei enthält",
+   "patternPlaceholder": "Zum Beispiel: ionos",
+   "whoHint": "Wählen Sie einen Kontakt oder geben Sie einen Text ein, den der Name der Gegenpartei im Bankumsatz enthält.",
+   "direction": "Richtung",
+   "account": "Konto",
+   "chooseAccount": "Konto wählen",
+   "taxCode": "Steuer",
+   "noTax": "Ohne Steuerschlüssel",
+   "paymentAccount": "Gegenkonto",
+   "defaultPaymentAccount": "Standard (Verbindlichkeiten oder Forderungen)",
+   "paymentAccountHint": "Wogegen die Rechnung gebucht wird, zum Beispiel das Verrechnungskonto von Meta.",
+   "noDocument": "Ohne Beleg buchen",
+   "noDocumentHint": "Für Bankumsätze, zu denen es keinen Beleg gibt, zum Beispiel die Stammeinlage.",
+   "active": "Aktiv",
+   "save": "Speichern",
+   "create": "Regel anlegen",
+   "edit": "Bearbeiten",
+   "deactivate": "Deaktivieren",
+   "activate": "Aktivieren",
+   "delete": "Regel löschen",
+   "deleteConfirm": "Regel löschen? Bestehende Buchungen bleiben unverändert.",
+   "deleteSubmit": "Löschen",
+   "empty": "Noch keine Regeln. Buchen Sie einen Vorschlag mit \"Als Regel speichern\" oder legen Sie eine an.",
+   "caption": "Buchungsregeln",
+   "columns": {
+    "who": "Kontakt oder Muster",
+    "direction": "Richtung",
+    "account": "Konto",
+    "tax": "Steuer",
+    "payment": "Gegenkonto",
+    "noDocument": "Ohne Beleg",
+    "hits": "Treffer",
+    "active": "Status",
+    "actions": "Aktionen"
+   },
+   "unknownContact": "Kontakt nicht gefunden",
+   "patternValue": "enthält \"{pattern}\"",
+   "learned": "Gelernt aus einer Buchung",
+   "defaultPaymentShort": "Standard",
+   "yes": "Ja",
+   "isActive": "Aktiv",
+   "isInactive": "Inaktiv"
+  },
+  "documentCard": {
+   "heading": "Buchhaltung",
+   "states": {
+    "locked": "Gesperrt",
+    "booked": "Gebucht",
+    "proposed": "Vorschlag",
+    "none": "Keine Buchung"
+   },
+   "bookingDate": "Buchungsdatum {date}.",
+   "lockedBy": "Gesperrt durch {filing}.",
+   "openProposal": "Vorschlag prüfen",
+   "openEntry": "Buchung ansehen",
+   "none": "Zu diesem Beleg gibt es noch keine Buchung.",
+   "dismissed": "Der Vorschlag zu diesem Beleg wurde verworfen. Es gibt keine Buchung.",
+   "create": "Buchung anlegen"
+  },
+  "discover": {
+   "title": "Buchhaltung (intern)",
+   "hint": "Doppelte Buchführung nach SKR 04 mit Vorschlägen, USt-VA-Vorschau und Abgleich mit der Steuerberaterin. Noch nicht aktiviert, nur für Admins sichtbar.",
+   "toLedger": "Zur Buchhaltung"
+  }
+ }
+}
