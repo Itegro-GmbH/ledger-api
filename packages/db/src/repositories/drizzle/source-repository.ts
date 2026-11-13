@@ -252,6 +252,8 @@ export function createDrizzleSourceRepository(db: DbExecutor): SourceRepository 
           target: [settlementLines.sourceDocumentId, settlementLines.externalLineId],
           set: {
             transactionId: sql`coalesce(excluded.transaction_id, settlement_lines.transaction_id)`,
+            // A re-read report may classify a line differently (Google's fee refunds).
+            type: refreshed("type"),
             grossCents: refreshed("gross_cents"),
             feeCents: refreshed("fee_cents"),
             netCents: refreshed("net_cents"),

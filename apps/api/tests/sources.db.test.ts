@@ -139,6 +139,23 @@ describe("sources through the API", () => {
     expect(accounts.find((account) => account.number === "1800")?.ownerBankAccountId).toBe(bank.id);
   });
 
+  it("upserts a platform report's settlement lines idempotently, only on a clearing account", async () => {
+    const secret = await platformKey();
+    const tenant = (await ok(caller(secret)("create_tenant", { name: "Muster GmbH", externalRef: `ref-${randomUUID()}` }))).tenant as { id: string };
+    const call = caller(secret, tenant.id);
+    const clearing = (await ok(call("create_money_account", { type: "clearing", name: "App Store", platform: "apple" }))).account as { id: string };
+    const bank = (await ok(call("create_money_account", { type: "bank", name: "Hausbank" }))).account as { id: string };
+    const report = randomUUID();
+    const line = { clearingAccountId: clearing.id, sourceDocumentId: report, externalLineId: "row-1", type: "revenue", grossCents: 199, feeCents: -30, netCents: 169, currency: "EUR", bookingDate: "2026-07-31" };
+
+    const first = (await ok(call("upsert_settlement_lines", { lines: [line] }))).lines as { id: string }[];
+    const second = (await ok(call("upsert_settlement_lines", { lines: [{ ...line, type: "fee", grossCents: null, netCents: -30 }] }))).lines as { id: string }[];
+    expect(second.map((row) => row.id)).toEqual(first.map((row) => row.id));
+
+    const onBank = await call("upsert_settlement_lines", { lines: [{ ...line, clearingAccountId: bank.id, externalLineId: "row-2" }] });
+    expect(onBank.body.error?.code).toBe("invalid_money_account_owner");
+  });
+
   it("never lets a tenant reach another tenant's sources", async () => {
     const secret = await platformKey();
     const tenantOf = async () => ((await ok(caller(secret)("create_tenant", { name: "Muster GmbH", externalRef: `ref-${randomUUID()}` }))).tenant as { id: string }).id;

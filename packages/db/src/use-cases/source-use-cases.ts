@@ -26,6 +26,8 @@ import type {
   Page,
   Paging,
   Repositories,
+  SettlementLineRow,
+  SettlementLineWrite,
   TransactionFilter,
   TransactionRow,
   TransactionWithLinks,
@@ -230,6 +232,10 @@ export interface SourceUseCases {
     forCounterparty?: boolean;
   }): Promise<{ updated: number; rule: string | null; alsoMarked: string[] }>;
   upsertPaymentAliases(input: { tenantId: string; actor: string; aliases: readonly { counterpartyName: string; contactId: string }[] }): Promise<{ counterpartyNameNormalized: string; contactId: string }[]>;
+  /** A platform report's lines (revenue, fee, refund, payout, adjustment) on a clearing account,
+   * idempotent by (report document, external line id); a line pushed again updates its amounts,
+   * type and date, and keeps a movement link once set. */
+  upsertSettlementLines(input: { tenantId: string; lines: readonly SettlementLineWrite[] }): Promise<SettlementLineRow[]>;
 }
 
 export type SourceUseCaseDeps = { repos: Repositories; uow: UnitOfWork; now?: () => Date };
@@ -609,6 +615,18 @@ export function createSourceUseCases(deps: SourceUseCaseDeps): SourceUseCases {
         const matching = (await repos.sources.listUnexplainedTransactionNames(tenantId)).filter((tx) => normalizeName(tx.counterpartyName) === normalized).map((tx) => tx.id);
         await repos.sources.setNoDocumentNeeded(tenantId, matching, true);
         return { updated, rule: normalized, alsoMarked: matching };
+      });
+    },
+
+    upsertSettlementLines({ tenantId, lines }) {
+      return transact(async (repos) => {
+        for (const accountId of new Set(lines.map((line) => line.clearingAccountId))) {
+          const account = await requireAccount(repos, tenantId, accountId);
+          if (account.type !== "clearing") throw new UseCaseError(SOURCE_ERROR.invalidOwner);
+        }
+        const movementIds = [...new Set(lines.map((line) => line.transactionId).filter((id): id is string => Boolean(id)))];
+        if (movementIds.length && (await repos.sources.findTransactions(tenantId, movementIds)).length !== movementIds.length) throw new UseCaseError(SOURCE_ERROR.movementNotFound);
+        return repos.sources.upsertSettlementLines(tenantId, lines);
       });
     },
 

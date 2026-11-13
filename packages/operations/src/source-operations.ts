@@ -4,7 +4,7 @@
 // names. Nothing here books: `sync_proposals` turns the sources into proposals, `book_entries`
 // books them. Amounts are integer cents; a movement is signed, money in positive.
 import { MAX_BULK_ENTRIES } from "@ledger/core";
-import { CONTACT_RELATION_TYPES, CONTACT_SOURCES, DOCUMENT_DIRECTIONS, DOCUMENT_KINDS, MONEY_ACCOUNT_TYPES } from "@ledger/db";
+import { CONTACT_RELATION_TYPES, CONTACT_SOURCES, DOCUMENT_DIRECTIONS, DOCUMENT_KINDS, MONEY_ACCOUNT_TYPES, SETTLEMENT_LINE_TYPES } from "@ledger/db";
 import { z } from "zod";
 
 import { defineOperation } from "./kit";
@@ -470,7 +470,55 @@ export const upsertPaymentAliases = defineOperation({
   },
 });
 
+
+export const upsertSettlementLines = defineOperation({
+  name: "upsert_settlement_lines",
+  title: "Upsert settlement lines",
+  description:
+    "The lines of a platform report (an app store's or payment provider's statement document): revenue, fee, " +
+    "refund, payout or adjustment, on the clearing account of that platform (a money account of type clearing). " +
+    "Idempotent by (report document, externalLineId): pushing a line again updates its type, amounts and date and " +
+    "keeps its movement link. transactionId links the payout line to the bank movement it arrived with.",
+  input: z.object({
+    lines: z
+      .array(
+        z.object({
+          id: z.uuid().optional(),
+          clearingAccountId: z.uuid(),
+          sourceDocumentId: z.uuid().describe("The report document"),
+          transactionId: z.uuid().nullable().optional(),
+          type: z.enum(SETTLEMENT_LINE_TYPES),
+          externalLineId: z.string().trim().min(1).max(200),
+          grossCents: cents.nullable().optional(),
+          feeCents: cents.nullable().optional(),
+          netCents: cents.nullable().optional(),
+          currency: z.string().length(3).nullable().optional(),
+          bookingDate: z.iso.date().nullable().optional(),
+          payoutId: z.string().max(200).nullable().optional(),
+          chargeId: z.string().max(200).nullable().optional(),
+          invoiceId: z.string().max(200).nullable().optional(),
+          customerName: z.string().max(300).nullable().optional(),
+          customerEmail: z.string().max(300).nullable().optional(),
+          productName: z.string().max(300).nullable().optional(),
+          countryOfSale: z.string().max(10).nullable().optional(),
+        }),
+      )
+      .min(1)
+      .max(MAX_BULK_ENTRIES),
+  }),
+  audience: "tenant",
+  scope: "write",
+  effect: "write",
+  async run(input, ctx) {
+    return withTenant(ctx, async ({ services: { sources }, tenantId }) => {
+      const rows = await sources.upsertSettlementLines({ tenantId, lines: input.lines });
+      return { lines: rows.map((row) => ({ id: row.id, externalLineId: row.externalLineId, transactionId: row.transactionId })) };
+    });
+  },
+});
+
 export const SOURCE_OPERATIONS = [
+  upsertSettlementLines,
   upsertCounterparties,
   listCounterparties,
   createMoneyAccount,
