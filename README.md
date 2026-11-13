@@ -24,5 +24,17 @@ pnpm build      # Vercel Build Output in .vercel/output
 curl -s -X POST localhost:8787/v1/list_tax_codes -H 'content-type: application/json' -d '{}'
 ```
 
+Database (`packages/db`, Postgres schema `ledger`):
+
+```sh
+pnpm db:generate                     # migration from a schema change (drizzle-kit)
+pnpm db:generate:custom <name>       # custom migration from packages/db/sql/<name>/<name>.sql
+DATABASE_URL=... pnpm db:migrate     # apply migrations (never a shared database without approval)
+
+docker run --rm -d --name ledger-test-pg -e POSTGRES_USER=ledger -e POSTGRES_PASSWORD=ledger \
+  -e POSTGRES_DB=ledger_test -p 55432:5432 postgres:17
+TEST_DATABASE_URL=postgres://ledger:ledger@localhost:55432/ledger_test pnpm test:db
+```
+
 Status: phase 1 in progress. Reference data is live; tenants, keys and bookings follow with the
 database layer.
