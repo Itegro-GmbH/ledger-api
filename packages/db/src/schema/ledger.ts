@@ -52,6 +52,7 @@ import {
   VAT_BASES,
   VAT_PERIODS,
   type BookingAdviceRaw,
+  type DatevTenantSettings,
   type EntrySnapshot,
   type ProposalWarningCode,
 } from "@ledger/core";
@@ -70,6 +71,8 @@ export const ledgerSettings = ledgerSchema.table("ledger_settings", {
   /** The first day the books cover; nothing before it is expected to be booked. */
   startDate: date({ mode: "string" }),
   chart: text({ enum: LEDGER_CHARTS }).notNull().default("skr04"),
+  /** The DATEV export's settings (`DatevTenantSettings`); `null` until the platform sets them. */
+  datev: jsonb().$type<DatevTenantSettings | null>(),
   createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
 });

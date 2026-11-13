@@ -97,7 +97,7 @@ function fakeLedger(state: State): LedgerRepository {
 
 function setup(options: { enabled?: boolean; commitError?: unknown } = {}) {
   const state: State = {
-    settings: options.enabled === false ? null : { tenantId: WS, enabled: true, vatPeriod: "month", vatBasis: "soll", startDate: null, chart: "skr04", createdAt: NOW, updatedAt: NOW },
+    settings: options.enabled === false ? null : { tenantId: WS, enabled: true, vatPeriod: "month", vatBasis: "soll", startDate: null, chart: "skr04", datev: null, createdAt: NOW, updatedAt: NOW },
     accounts: accountRows(),
     entries: [],
     lines: [],

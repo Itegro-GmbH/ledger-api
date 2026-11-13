@@ -28,6 +28,11 @@
 // open-item account that book and pay the same document and sum to zero; anything else is only
 // suggested (`suggestMatches`).
 import {
+  buildDatevExport,
+  resolveDatevSettings,
+  type DatevSettingsInput,
+  type DatevTenantSettings,
+  type DatevWarning,
   type BankBalanceComparison,
   adviceQuestionsFor,
   BANK_ACCOUNT_NUMBERS,
@@ -161,12 +166,19 @@ export const LEDGER_ERROR = {
   matchNotZero: "match_not_zero",
   advisorFileInvalid: "advisor_file_invalid",
   ruleSourceMissing: "rule_source_missing",
+  datevSettingsMissing: "datev_settings_missing",
+  tooManyEntries: "too_many_entries",
 } as const satisfies Record<string, LedgerUseCaseErrorCode>;
 export type LedgerErrorCode = (typeof LEDGER_ERROR)[keyof typeof LEDGER_ERROR];
 
 const DEFAULT_SETTINGS: LedgerSettingsView = { enabled: false, vatPeriod: "month", vatBasis: "soll", startDate: null, chart: "skr04" };
 
 export type ProposalOutcome = "created" | "updated" | "kept";
+
+/** One DATEV file covers at most this many booked entries; a larger period is exported in parts. */
+export const DATEV_ENTRY_LIMIT = 2000; // the journal list maximum; a full list may hide more entries
+
+export type DatevExportResult = { fileName: string; text: string; rowCount: number; entryCount: number; warnings: DatevWarning[] };
 
 export type BulkBookResult = { booked: string[]; failed: { entryId: string; errorCode: LedgerErrorCode | "unknown" }[] };
 
@@ -272,6 +284,13 @@ export interface LedgerUseCases {
   suggestMatches(tenantId: string, accountId: string): Promise<MatchSuggestion[]>;
   /** "Als Regel speichern": creates or updates the rule of the entry's contact or counterparty. */
   learnRuleFromEntry(input: { tenantId: string; entryId: string }): Promise<BookingRuleView>;
+
+  // The DATEV export (decisions/0001 "DATEV export")
+  getDatevSettings(tenantId: string): Promise<DatevTenantSettings | null>;
+  setDatevSettings(input: { tenantId: string; settings: DatevSettingsInput }): Promise<DatevTenantSettings>;
+  /** The Buchungsstapel of the booked entries in `from`..`to` (one fiscal year at most). Throws
+   * `datev_settings_missing`, `too_many_entries`, or the writer's own refusal code. */
+  createDatevExport(input: { tenantId: string; from: string; to: string; description?: string }): Promise<DatevExportResult>;
 }
 
 export type LedgerUseCaseDeps = {
@@ -1831,6 +1850,44 @@ export function createLedgerUseCases(deps: LedgerUseCaseDeps): LedgerUseCases {
       if (!account) throw new UseCaseError(LEDGER_ERROR.accountNotFound);
       if (!account.openItems) throw new UseCaseError(LEDGER_ERROR.accountNotOpenItems);
       return suggestMatchGroups(await ledger.listUnmatchedOpenItemLines(tenantId, account.id));
+    },
+
+    async getDatevSettings(tenantId) {
+      await requireEnabled(tenantId);
+      return (await deps.repos.ledger.findSettings(tenantId))?.datev ?? null;
+    },
+
+    async setDatevSettings({ tenantId, settings }) {
+      await requireEnabled(tenantId);
+      const stored: DatevTenantSettings = { ...settings, taxKeys: settings.taxKeys ?? null, automaticAccounts: settings.automaticAccounts ?? null };
+      if (!(await deps.repos.ledger.setDatevSettings(tenantId, stored))) throw new UseCaseError(LEDGER_ERROR.disabled);
+      return stored;
+    },
+
+    async createDatevExport({ tenantId, from, to, description }) {
+      const settingsRow = await requireEnabled(tenantId);
+      if (!settingsRow.datev) throw new UseCaseError(LEDGER_ERROR.datevSettingsMissing);
+      const entries = await api.listEntries(tenantId, { from, to, status: "booked", limit: DATEV_ENTRY_LIMIT });
+      if (entries.length >= DATEV_ENTRY_LIMIT) throw new UseCaseError(LEDGER_ERROR.tooManyEntries);
+      const documentIds = new Set(entries.map((entry) => entry.documentId).filter((id): id is string => id !== null));
+      const numbers = new Map(
+        documentIds.size === 0 ? [] : (await deps.sources.listDocumentsForLedger(tenantId)).filter((doc) => documentIds.has(doc.id)).map((doc) => [doc.id, doc.invoiceNumber] as const),
+      );
+      const result = buildDatevExport({
+        settings: resolveDatevSettings(settingsRow.datev, settingsRow.chart, from),
+        period: { from, to },
+        entries: entries.map((entry) => ({
+          id: entry.id,
+          bookingDate: entry.bookingDate,
+          text: entry.text,
+          documentNumber: entry.documentId ? (numbers.get(entry.documentId) ?? null) : null,
+          lines: entry.lines.map((line) => ({ position: line.position, accountNumber: line.accountNumber, amountCents: line.amountCents, taxCode: line.taxCode, taxRole: line.taxRole, generatedFromLinePosition: line.generatedFromLinePosition })),
+        })),
+        description: description ?? `Buchungen ${from} bis ${to}`,
+        createdAt: now(),
+      });
+      if (!result.ok) throw new UseCaseError(result.error);
+      return { fileName: result.fileName, text: result.text, rowCount: result.rows.length, entryCount: entries.length, warnings: result.warnings };
     },
 
     async learnRuleFromEntry({ tenantId, entryId }) {
