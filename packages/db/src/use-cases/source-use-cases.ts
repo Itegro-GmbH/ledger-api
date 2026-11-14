@@ -50,6 +50,8 @@ export const SOURCE_ERROR = {
   duplicateExternalId: "duplicate_external_id",
   documentNotFound: "document_not_found",
   documentIdTaken: "document_id_taken",
+  moneyAccountIdTaken: "money_account_id_taken",
+  movementIdTaken: "movement_id_taken",
   duplicateDocumentId: "duplicate_document_id",
   externalRefTaken: "external_ref_taken",
   directionMismatch: "direction_mismatch",
@@ -70,6 +72,9 @@ const UNIQUE_ERRORS: Record<string, SourceErrorCode> = {
   accounts_tenant_contact_clearing_key: SOURCE_ERROR.clearingOwnerTaken,
   documents_tenant_external_ref_key: SOURCE_ERROR.externalRefTaken,
   transactions_account_idempotency_key: SOURCE_ERROR.duplicateExternalId,
+  // A caller's own id that another account or tenant already holds.
+  accounts_pkey: SOURCE_ERROR.moneyAccountIdTaken,
+  transactions_pkey: SOURCE_ERROR.movementIdTaken,
 };
 
 export type CounterpartyInput = {
@@ -107,6 +112,8 @@ export type CounterpartyInput = {
 };
 
 export type MoneyAccountInput = {
+  /** Keeps the caller's own id (Digipost's account ids); a new one is generated otherwise. */
+  id?: string;
   type: MoneyAccountType;
   name: string;
   iban?: string | null;
@@ -122,6 +129,9 @@ export type MoneyAccountInput = {
 export type MoneyAccountPatchInput = { name?: string; iban?: string | null; bic?: string | null; currency?: string; holder?: string | null };
 
 export type MovementInput = {
+  /** Keeps the caller's own id for a new movement (Digipost's transaction ids); a new one is
+   * generated otherwise. A movement already stored keeps its id. */
+  id?: string;
   /** The caller's id of the movement, unique per account (a Stripe balance transaction id, a bank
    * end-to-end id). Pushing it again changes nothing but its descriptive fields. */
   externalId: string;
@@ -319,6 +329,7 @@ export function createSourceUseCases(deps: SourceUseCaseDeps): SourceUseCases {
 
   function movementRow(movement: MovementInput): TransactionWrite {
     return {
+      ...(movement.id ? { id: movement.id } : {}),
       idempotencyKey: movement.externalId,
       bookingDate: movement.bookingDate,
       valueDate: movement.valueDate ?? null,
@@ -457,6 +468,7 @@ export function createSourceUseCases(deps: SourceUseCaseDeps): SourceUseCases {
       return transact(async (repos) => {
         await requireContacts(repos, tenantId, [contactId]);
         return repos.sources.insertMoneyAccount(tenantId, {
+          ...(account.id ? { id: account.id } : {}),
           type: account.type,
           name: account.name,
           iban: nullableCode(account.iban),

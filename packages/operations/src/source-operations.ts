@@ -130,6 +130,7 @@ export const createMoneyAccount = defineOperation({
     "pair one to one with its charges, named by counterpartyId). A clearing account has exactly one of platform and " +
     "counterpartyId, a bank account neither. The ledger gives it its own ledger account at the next sync_proposals.",
   input: z.object({
+    id: z.uuid().optional().describe("Keep your own id; a new one is generated otherwise. Refused with money_account_id_taken when it is in use"),
     type: z.enum(MONEY_ACCOUNT_TYPES),
     name: text(200),
     iban: optionalText(42).describe("Unique per tenant"),
@@ -190,6 +191,7 @@ export const listMoneyAccounts = defineOperation({
 // --- Money movements ---------------------------------------------------------------------------
 
 const movementFields = z.object({
+  id: z.uuid().optional().describe("Keep your own id for a new movement; a new one is generated otherwise. A stored movement keeps its id; refused with movement_id_taken when another movement holds it"),
   externalId: text(200).describe("Your id of the movement, unique per account: a Stripe balance transaction id, a bank end-to-end id or a hash"),
   bookingDate: isoDate,
   valueDate: isoDate.nullable().optional(),

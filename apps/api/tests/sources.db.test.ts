@@ -156,6 +156,27 @@ describe("sources through the API", () => {
     expect(onBank.body.error?.code).toBe("invalid_money_account_owner");
   });
 
+  it("keeps a caller's own ids for new money accounts and movements, and refuses one already in use", async () => {
+    const secret = await platformKey();
+    const tenantOf = async () => ((await ok(caller(secret)("create_tenant", { name: "Muster GmbH", externalRef: `ref-${randomUUID()}` }))).tenant as { id: string }).id;
+    const [call, other] = [caller(secret, await tenantOf()), caller(secret, await tenantOf())];
+    const accountId = randomUUID();
+    const movementId = randomUUID();
+
+    const bank = (await ok(call("create_money_account", { id: accountId, type: "bank", name: "Hausbank" }))).account as { id: string };
+    expect(bank.id).toBe(accountId);
+    const movement = { id: movementId, externalId: "tx-1", bookingDate: "2026-07-01", amountCents: 2500 };
+    const first = await ok(call("upsert_money_movements", { accountId, movements: [movement] }));
+    expect((first.movements as { id: string }[]).map((row) => row.id)).toEqual([movementId]);
+    // Pushed again under another id: still the stored movement with its first id.
+    const again = await ok(call("upsert_money_movements", { accountId, movements: [{ ...movement, id: randomUUID() }] }));
+    expect((again.movements as { id: string }[]).map((row) => row.id)).toEqual([movementId]);
+
+    const otherBank = (await ok(other("create_money_account", { type: "bank", name: "Hausbank" }))).account as { id: string };
+    expect((await other("create_money_account", { id: accountId, type: "bank", name: "Zweitbank" })).body.error?.code).toBe("money_account_id_taken");
+    expect((await other("upsert_money_movements", { accountId: otherBank.id, movements: [{ ...movement, externalId: "tx-2" }] })).body.error?.code).toBe("movement_id_taken");
+  });
+
   it("never lets a tenant reach another tenant's sources", async () => {
     const secret = await platformKey();
     const tenantOf = async () => ((await ok(caller(secret)("create_tenant", { name: "Muster GmbH", externalRef: `ref-${randomUUID()}` }))).tenant as { id: string }).id;
